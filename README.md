@@ -34,19 +34,21 @@ Each brand and competitor is checked with `qloo_describe` when you add it. If a 
 you pick the right Qloo entity. International markets work: Qloo filters by country and city.
 
 ### A real run
-Live test on 2026-10-29, brand **Allbirds** against **Nike** and **Adidas**, US market, live Qloo hackathon API:
+Live run of the hosted demo project on 2026-10-29, on the code in this repository: brand **Allbirds** against **Nike** and **Adidas**,
+US market, live Qloo hackathon API:
 
 | | |
 |---|---|
-| Qloo calls | **15 of 15 ok**: 12 chosen by the model through the tool gate, 3 entity checks (`qloo_describe`) made by code |
-| Qloo tools used | `qloo_describe`, `qloo_trends`, `qloo_where_popular`, `qloo_audience_demographics`, `qloo_entity_tags`, `qloo_recommend` (podcasts), `qloo_compare_audiences` |
-| Run time | **147 s** for the whole loop, both competitors |
-| Output | **2 attack packages**, each citing **6 Qloo calls** (12 citations in total), then Meta, TikTok and Google templates per package |
-| Tool gate | 0 calls dropped; the copy check dropped 4 angles that did not name a gap or interest |
-| Model that ran | `glm-4.7-flash` (`glm-5.3-flash` returned a quota error; `glm-4.5-flash` answered one worker turn when 4.7-flash was overloaded) |
-| vs last run | not shown on a first run; it appears from the second completed run |
+| Qloo calls | **17 of 17 ok**: all 17 chosen by the model through the tool gate, none filled in by code (8 for Nike, 9 for Adidas) |
+| Qloo tools used | `qloo_trends`, `qloo_where_popular`, `qloo_audience_demographics`, `qloo_entity_tags`, `qloo_recommend` (podcasts, TV shows and brands for both competitors, plus artists for Adidas), `qloo_compare_audiences`. The `qloo_describe` entity checks ran when the demo project was set up, not in this run |
+| Run time | **278 s** (4 min 38 s) for the whole loop, both competitors |
+| Output | **2 attack packages**, citing **8** and **9 Qloo calls** (17 citations in total), then **6 ad templates**: Meta, TikTok and Google per package |
+| Tool gate | **1 call dropped**: an extra `qloo_compare_audiences` that went over the per-turn limit, logged and shown on the board. For Nike the model's copy angles failed the grounding check, so AdFlank used its deterministic angles built from the gap tags and labelled them as a fallback |
+| Model that ran | `glm-4.5-flash` for the Planner and both Workers, `glm-4.7-flash` for the copy. The configured `glm-5.3-flash` returned Z.ai error 1113 (insufficient balance) and `glm-4.7-flash` was rate-limited (429) during research, so the fallback chain ran |
+| vs last run | shown for both competitors, against the project's previous completed run that day: momentum 0 pts before and now (all three brands flat in Qloo's trend window), taste gap unchanged, recommendations 12 new for each competitor, 4 gone for Nike and 8 for Adidas. Verdict: "Allbirds is not gaining yet" |
 
-All three ad templates built from these packages passed their platform checks with 0 errors, and the Meta and Google CSVs exported.
+All six ad templates built from these packages pass their platform checks with 0 errors. The warnings are platform ids and the video to
+add at upload time, and Qloo locations with no nearby metro, which are left out of targeting.
 
 ### Ad templates
 Each attack package becomes one ready-to-publish template per platform, in that platform's format and limits, with a mockup preview
