@@ -21,11 +21,12 @@ stored call behind any number.
 1. **Watch**: `qloo_trends` on your brand and each competitor (who is rising, who is falling), and `qloo_where_popular` for the cities and
    regions where each competitor's audience is strongest.
 2. **Profile** people like each competitor's customers: `qloo_audience_demographics` (age and gender skew), `qloo_entity_tags` (the tags
-   that define their taste) and `qloo_recommend` (the podcasts, brands, artists and shows they also like).
+   that define their taste) and `qloo_recommend`, run once each for the podcasts, TV shows and brands they also like.
 3. **Find the gap**: `qloo_compare_audiences`, your audience against theirs, shows what their fans love that yours don't. That is the
    switching hook.
-4. **Build the attack package**: where (geo), who (age and gender), interests to target, podcasts and creators to sponsor, and ad-copy
-   angles. A copy angle is kept only if it names a gap or an interest from the package; the rest are dropped and the drop is logged.
+4. **Build the attack package**: where (geo), who (age and gender), interests to target, podcasts and TV shows to sponsor, brands to
+   partner with, and ad-copy angles. The project's own brand and competitors are never listed as partners or recommendations. A copy
+   angle is kept only if it names a gap or an interest from the package; the rest are dropped and the drop is logged.
 5. **Measure**: from the second run on, each package is compared with the previous run of the same project and says whether you are gaining
    on that competitor (trend momentum, brand minus competitor, and the size of the taste gap).
 
@@ -196,8 +197,9 @@ npm run e2e -- --brand Allbirds --competitors Nike,Adidas --country US --out <di
 
 ## Try the hosted demo
 Open the live demo (link at the top) and press **Try the live demo (no signup)**. This opens a shared, read-only demo project (Allbirds vs Nike and Adidas)
-with a completed run: the board, the attack packages with their citations, and **Ad templates**. Or **Sign up free** with any email and
-a password of 8 or more characters (no email verification), add your own brand and competitors, and press **Run now**.
+with two seeded runs: the board, the attack packages with their citations, the **vs last run** strip that shows what changed between
+the two runs, and **Ad templates**. Or **Sign up free** with any email and a password of 8 or more characters (no email verification),
+add your own brand and competitors, and press **Run now**.
 
 ## Data and privacy
 No Qloo response data is stored in this repository. The test fixtures are synthetic. Qloo results live only in the app's own database. The
@@ -209,3 +211,6 @@ Docker · Vitest
 
 ## License
 MIT, see [LICENSE](LICENSE).
+
+Third-party notices: `src/lib/qloo/tool-schemas.json` comes from `@qloo/qloo-harness` 0.1.26 (MIT, Copyright (c) 2026 Qloo);
+see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

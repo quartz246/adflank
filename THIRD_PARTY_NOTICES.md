@@ -1,0 +1,36 @@
+# Third-party notices
+
+AdFlank is released under the MIT License (see [LICENSE](LICENSE)). It also contains the third-party material listed below,
+which keeps its own copyright and licence.
+
+## @qloo/qloo-harness
+
+- **File in this repository:** `src/lib/qloo/tool-schemas.json`
+- **Source:** the npm package [`@qloo/qloo-harness`](https://www.npmjs.com/package/@qloo/qloo-harness), version 0.1.26
+- **What was copied:** the tool definitions only (name, description and input schema of the nine Qloo tools). It holds no Qloo
+  response data. AdFlank's offline mock client uses these definitions to describe the tools.
+- **Licence:** MIT, Copyright (c) 2026 Qloo. The licence text from the package, verbatim:
+
+```text
+MIT License
+
+Copyright (c) 2026 Qloo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
