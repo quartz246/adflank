@@ -1,0 +1,10 @@
+node_modules
+.next
+data
+.qloo-home
+.env*
+!.env.example
+runs
+*.log
+.git
+*.tsbuildinfo
