@@ -456,3 +456,6 @@ html[data-design="5"] .home-roles { justify-content: flex-start; }
 .wz-why-tabs button { all: unset; cursor: pointer; padding: 6px 14px; min-height: 32px; box-sizing: border-box; display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid var(--w-line2); font-size: 13px; font-weight: 600; color: var(--w-text2); }
 .wz-why-tabs button.on { background: var(--w-blue); border-color: var(--w-blue); color: var(--w-on-accent); }
 @media (max-width: 800px) { .wz-why-tabs button { min-height: 44px; } }
+
+.siteform-steps { display: block; margin-top: 10px; text-align: center; font-size: 13px; font-weight: 600; color: var(--w-muted, #a3abb2) !important; text-decoration: none !important; }
+.siteform-steps:hover { color: var(--w-text, #eef1f3) !important; text-decoration: underline !important; text-underline-offset: 3px; }

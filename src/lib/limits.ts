@@ -17,6 +17,7 @@ export const LIMITS = {
   signupsPerIpHour: () => n("SIGNUP_LIMIT_PER_IP_HOUR", 10),
   loginsPerIpHour: () => n("LOGIN_LIMIT_PER_IP_HOUR", 60),
   projectsPerUserDay: () => n("PROJECT_LIMIT_PER_USER_DAY", 15),
+  lookupsPerIpHour: () => n("LOOKUP_LIMIT_PER_IP_HOUR", 60),
 };
 
 /** Client address as seen through the Cloudflare tunnel (cf-connecting-ip), else the first forwarded hop. */
@@ -43,12 +44,13 @@ export function allowRun(userId: number, ip: string, isDemo: boolean): LimitResu
   return { ok: true };
 }
 
-export function allow(kind: "chat" | "signup" | "login" | "project", key: string): LimitResult {
+export function allow(kind: "chat" | "signup" | "login" | "project" | "lookup", key: string): LimitResult {
   const table = {
     chat: [HOUR, LIMITS.chatPerUserHour(), "Chat limit reached for this hour."],
     signup: [HOUR, LIMITS.signupsPerIpHour(), "Too many signups from your network. Try again later."],
     login: [HOUR, LIMITS.loginsPerIpHour(), "Too many login attempts. Try again later."],
     project: [DAY, LIMITS.projectsPerUserDay(), "Project limit reached for today."],
+    lookup: [HOUR, LIMITS.lookupsPerIpHour(), "Too many Qloo lookups from your network. Try again in a while."],
   } as const;
   const [win, max, msg] = table[kind];
   return rate.hit(kind, key, win, max) ? { ok: true } : { ok: false, message: msg };

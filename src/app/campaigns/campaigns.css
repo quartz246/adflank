@@ -57,3 +57,4 @@
   .mc-grid { grid-template-columns: 1fr; }
   .acct-email { display: none; }
 }
+.wz.mc .wz-top { height: 56px; }

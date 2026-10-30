@@ -99,7 +99,9 @@ export async function findCompetitors(st: RunCtx, site: SiteInfo): Promise<Entit
   const list = entities.forProject(st.project.id);
   const existing = list.filter((e) => e.role === "competitor");
   if (existing.length) {
-    step(st, 2, "done", `${existing.length} competitor${existing.length > 1 ? "s" : ""} already set`);
+    st.log("agent", `you picked ${existing.map((e) => e.name).join(" and ")}; profiling their fans`);
+    st.log("rivals", JSON.stringify({ source: "picked by you", pool: 0, kind: "direct", picked: true }));
+    step(st, 2, "done", existing.map((e) => e.name).join(", "));
     return existing;
   }
   const brand = list.find((e) => e.role === "brand")!;

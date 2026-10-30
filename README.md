@@ -36,6 +36,11 @@ Every number cites the Qloo call it came from (`q_<run>_<n>`), and you can open 
      focus (over-indexed bands are marked), platforms, and **Replace segment** (swaps a campaign for the next segment in the data).
    - **Launch campaign** is a labelled preview: publishing to ad platforms comes after the hackathon.
 
+**Step-by-step setup** (`/start`, "or pick your rivals, market and budget step by step" under the website box): your website,
+then tick up to two rivals from the brands Qloo says your fans also love (or search Qloo for one by name), the market and age
+focus, then platforms and daily budget, with an agency brief filling in beside it. Every step can be skipped and the agents decide.
+The rivals you pick are set before the run, so the agents go straight to profiling their fans.
+
 **My campaigns** (`/campaigns`): sign up, or claim the guest project with an email and password, and every brand you paste gets a
 card with its rivals, campaigns, daily budget, estimated weekly reach, cities, status and next daily check, plus totals across all of
 them, **Run again**, and the website box to start on a new rival. Your choices on the campaign screen (budget, levers, replaced

@@ -1,12 +1,14 @@
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { GUEST_DOMAIN, isGuestUser, csrfError, currentUser, isHttps, json, newSessionCookie } from "@/lib/auth/session";
-import { projects, users } from "@/lib/db/repo";
+import { campaignSettings, entities, projects, users } from "@/lib/db/repo";
+import { NAME_RE } from "@/lib/agent/check";
+import { BANDS, budgetAt, PLATFORMS, runsFor, SLIDER, type CampaignSettings } from "@/lib/campaign/plan";
 import { COUNTRY_CODES } from "@/lib/geo/cities";
 import { isDemoUser } from "@/lib/demo";
 import { allow, allowRun, clientIp } from "@/lib/limits";
 import { startRun } from "@/lib/agent/run";
-import { SITE_TRIGGER } from "@/lib/agent/wizard";
+import { MAX_RIVALS, SITE_TRIGGER } from "@/lib/agent/wizard";
 import { domainOf, normaliseSite } from "@/lib/site/read";
 import { serializeCookie } from "../auth/signup/route";
 
@@ -16,6 +18,9 @@ const body = z
   .object({
     site: z.string().trim().min(3).max(300),
     countryCode: z.string().trim().toUpperCase().refine((c) => COUNTRY_CODES.includes(c), "Unsupported country").optional(),
+    // From the step-by-step setup: rivals ticked from Qloo's list, and campaign preferences.
+    competitors: z.array(z.object({ id: z.string().regex(/^[A-Za-z0-9-]{6,64}$/), name: z.string().trim().min(1).max(60).regex(NAME_RE) }).strict()).max(MAX_RIVALS).optional(),
+    prefs: z.object({ pos: z.number().int().min(0).max(SLIDER), plats: z.array(z.enum(PLATFORMS)).max(3), ages: z.array(z.enum(BANDS)).max(5) }).strict().optional(),
   })
   .strict();
 
@@ -45,6 +50,16 @@ export async function POST(req: Request) {
   const project = projects.create(user.id, domainOf(url), p.data.countryCode ?? "US", null);
   // Guest projects do not run daily on their own; signing up turns the schedule on.
   projects.update(project.id, { landing_url: url, schedule_daily: isGuestUser(user) ? 0 : 1 });
+  // Rivals the owner picked are set before the run; the agents then skip choosing and profile these.
+  for (const c of p.data.competitors ?? []) {
+    const e = entities.add(project.id, "competitor", c.name);
+    entities.setResolution(e.id, { status: "found", qloo_id: c.id, qloo_type: "urn:entity:brand", qloo_name: c.name });
+  }
+  if (p.data.prefs) {
+    const { pos, plats, ages } = p.data.prefs;
+    const s: CampaignSettings = { v: 1, pos, active: Array.from({ length: runsFor(budgetAt(pos)) }, (_, n) => n), retired: [], match: "balanced", perSet: 1, ages: ages.length ? ages : [...BANDS], plats: plats.length ? plats : [...PLATFORMS], picked: {}, launched: false };
+    campaignSettings.set(project.id, JSON.stringify(s));
+  }
   const { runId } = startRun(project.id, SITE_TRIGGER);
   const res = json({ projectId: project.id, runId }, 202);
   if (cookie) res.headers.append("set-cookie", cookie);
