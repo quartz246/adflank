@@ -200,7 +200,7 @@ export default function Wizard({ projectId, initial }: { projectId: number; init
               ? <FanProfile comps={v.comps.map((c) => ({ name: c.name, done: c.done, pkg: c.pkg as AttackPackage, heat: c.heat }))} ci={ci} onPick={setCi} brand={v.brand?.name ?? v.project.name} country={v.project.country ?? "US"} designing={!campaignReady && steps[5]?.status === "working"} projectId={projectId} ready={campaignReady} onOpen={(n) => { setFocusSeg({ n, at: Date.now() }); setSel(4); }} />
               : steps.slice(2, 5).every((r) => r.status === "skipped") ? <div className="wz-card muted">{steps[2].note}</div> : <Skeleton />)}
             {shownStage === 4 && (campaignReady && v.comps.length
-              ? <AgencyStudio pkgs={v.comps.map((c) => c.pkg as AttackPackage)} brand={v.brand?.name ?? v.project.name} start={`/go/${projectId}/campaign`} focus={focusSeg} heat={v.comps.flatMap((c) => c.heat)} />
+              ? <AgencyStudio pkgs={v.comps.map((c) => c.pkg as AttackPackage)} brand={v.brand?.name ?? v.project.name} start={`/go/${projectId}/campaign`} focus={focusSeg} heat={v.comps.flatMap((c) => c.heat)} scheduled={"scheduled" in v.project ? v.project.scheduled : undefined} />
               : <Skeleton rows={4} />)}
           </div>
 

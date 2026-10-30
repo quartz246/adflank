@@ -297,3 +297,7 @@
   .ag-replace { margin-left: 0; }
   .ag-replace, .ag-launch { flex: 1; text-align: center; min-height: 22px; }
 }
+
+.ag-daily { margin: 4px 0 0; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #bdf5cf; }
+.ag-daily i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: agpulse 1.6s infinite; }
+.ag-daily a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
