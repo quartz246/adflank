@@ -13,7 +13,7 @@ Built for the Qloo Agentic Hackathon (2026).
 
 ## What it does
 
-### Paste a website, watch four steps (about 1-2 minutes, no signup)
+### Paste a website, watch four steps (usually 1-3 minutes, no signup)
 Every number cites the Qloo call it came from (`q_<run>_<n>`), and you can open the stored call behind it.
 
 1. **Read your website**: the agent reads the homepage and names the brand (and looks it up with `qloo_describe`).
