@@ -270,6 +270,10 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
       </div>
 
       <div className="ag-tune" aria-label="Tune the campaigns with Qloo">
+        <p className="ag-qloo">
+          <b>Segments powered by Qloo</b>
+          <span>Each segment is one competitor&apos;s fans narrowed by three live Qloo signals: a <em>taste</em> from Qloo&apos;s taste graph<QlooCite id={s.taste.cite} />, a <em>city</em> from Qloo&apos;s heatmap<QlooCite id={s.place.cite} /> and an <em>age band</em> from Qloo&apos;s audience demographics<QlooCite id={s.demo.cite} />. The levers below re-cut them from the same Qloo data.</span>
+        </p>
         <div className="ag-lever">
           <span className="lb" title={MATCH.find((m) => m.id === match)!.note}>Taste match</span>
           <div className="ag-segctl">{MATCH.map((m) => <button key={m.id} type="button" className={match === m.id ? "on" : ""} onClick={() => setMatch(m.id)} title={m.note}>{m.label}</button>)}</div>
@@ -286,7 +290,7 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
           <span className="lb">Platforms</span>
           <div className="ag-segctl multi">{(Object.keys(PLAT) as Platform[]).map((p) => <button key={p} type="button" className={plats.includes(p) ? "on" : ""} onClick={() => setPlats((x) => toggle(x, p))}>{PLAT[p]}</button>)}</div>
         </div>
-        <button type="button" className="ag-replace" onClick={replace} disabled={!spare.length} title={spare.length ? "Swap this campaign for the next segment in Qloo's data" : "No more segments in Qloo's data for these competitors"}>↻ Replace segment</button>
+        <button type="button" className="ag-replace" onClick={replace} disabled={!spare.length} title={spare.length ? "Swap this campaign for the next segment in Qloo's data" : "No more segments in Qloo's data for these competitors"}>↻ Replace<span className="ag-wide"> segment</span></button>
         <button type="button" className="ag-launch" disabled={!live.length || !plats.length} onClick={() => setLaunched(true)}>{launched ? "✓ Ready (preview)" : "Launch campaign →"}</button>
       </div>
       {launched && <p className="ag-note">Preview: {live.length} campaigns are ready at ${budget.toLocaleString("en-US")}/day. AdFlank does not publish or spend yet; connecting Meta, TikTok and Google Ads comes after the hackathon. <a href={start}>Open the campaign manager →</a></p>}

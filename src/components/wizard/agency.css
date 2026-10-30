@@ -309,3 +309,23 @@
 .ag-daily { margin: 4px 0 0; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #bdf5cf; }
 .ag-daily i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: agpulse 1.6s infinite; }
 .ag-daily a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+
+.ag-qloo { flex: 1 1 100%; margin: 0 0 2px; display: flex; gap: 10px; align-items: baseline; font-size: 12.5px; line-height: 1.4; color: var(--w-text2); }
+.ag-qloo b { flex: none; padding: 2px 10px; border-radius: 999px; background: var(--w-blue-soft); color: var(--w-blue); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.ag-qloo em { font-style: normal; font-weight: 700; color: var(--w-text); }
+.ag-qloo .aw-cite { margin-left: 4px; padding: 0 6px; font-size: 10.5px; }
+@media (min-width: 801px) and (max-height: 820px) {
+  .ag-sub { display: none; }
+}
+@media (max-width: 800px) {
+  .ag-qloo { flex-direction: column; gap: 4px; }
+}
+@media (min-width: 801px) and (max-width: 1360px) {
+  .ag-tune { gap: 6px 10px; padding: 8px 12px; }
+  .ag-qloo { font-size: 11.5px; }
+  .ag-lever .lb { font-size: 9.5px; }
+  .ag-segctl button { padding: 4px 7px; font-size: 11.5px; }
+  .ag-replace { padding: 7px 12px; font-size: 12.5px; }
+  .ag-launch { padding: 8px 14px; font-size: 13px; }
+  .ag-wide { display: none; }
+}
