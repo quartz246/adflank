@@ -105,10 +105,16 @@ export default function CampaignMap({ pins, heat, sel, focused, onPick }: {
             const [x, y] = proj(h.lat, h.lon);
             return <circle key={`h${i}`} cx={x} cy={y} r={px * 16} className="heat" />;
           })}
-          {pins.map((p) => {
+          {pins.map((p, pi) => {
             const [x, y] = proj(p.lat, p.lon);
+            // In screen pixels: hide this city's name when an earlier pin (or its name) sits on the same line nearby.
+            const named = !pins.slice(0, pi).some((q) => {
+              const [qx, qy] = proj(q.lat, q.lon);
+              return Math.abs(qy - y) / px < 18 && (x - qx) / px > -24 && (x - qx) / px < 120;
+            });
             const on = p.campaigns.includes(sel);
-            const label = p.campaigns.map((n) => n + 1).join("·");
+            const nums = p.campaigns.map((n) => n + 1);
+            const label = nums.length > 3 ? `${nums[0]}+${nums.length - 1}` : nums.join("·");
             const r = px * (label.length > 1 ? 15 : 13);
             return (
               <g key={p.key} className={`pin${on ? " on" : ""}`} onClick={() => onPick(p)} role="button" aria-label={`Campaign ${label} in ${p.label}`}>
@@ -116,7 +122,7 @@ export default function CampaignMap({ pins, heat, sel, focused, onPick }: {
                 {on && <circle cx={x} cy={y} r={r} className="pulse" />}
                 <circle cx={x} cy={y} r={r} className="dot" strokeWidth={px * 2} />
                 <text x={x} y={y + px * 4.2} fontSize={px * 12} textAnchor="middle" className="num">{label}</text>
-                <text x={x + r + px * 6} y={y + px * 4.5} fontSize={px * 13} className="nm" strokeWidth={px * 4}>{p.label}</text>
+                {(named || on) && <text x={x + r + px * 6} y={y + px * 4.5} fontSize={px * 13} className="nm" strokeWidth={px * 4}>{p.label}</text>}
               </g>
             );
           })}

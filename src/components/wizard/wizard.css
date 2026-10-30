@@ -434,7 +434,7 @@
 .cs-sub b { color: var(--w-text); }
 .home-roles { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-top: 18px; animation: wzin .6s .2s ease both; }
 .home-roles .lab { font-size: 12px; color: var(--w-muted); margin-right: 4px; }
-.home-roles .role { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; color: var(--w-text2); background: color-mix(in srgb, var(--w-card) 70%, transparent); border: 1px solid var(--w-line2); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--w-red) 70%, transparent); text-decoration-thickness: 1.5px; }
+.home-roles .role { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; color: var(--w-text2); background: color-mix(in srgb, var(--w-card) 70%, transparent); border: 1px solid var(--w-line2); }
 
 html[data-design="5"] .home-roles { justify-content: flex-start; }
 

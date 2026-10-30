@@ -306,8 +306,8 @@
   .ag-replace, .ag-launch { flex: 1; text-align: center; min-height: 22px; }
 }
 
-.ag-daily { margin: 4px 0 0; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #bdf5cf; }
-.ag-daily i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: agpulse 1.6s infinite; }
+.ag-daily { margin: 4px 0 0; font-size: 12.5px; font-weight: 600; line-height: 1.45; color: #bdf5cf; }
+.ag-daily i { display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #4ade80; vertical-align: 1px; animation: agpulse 1.6s infinite; }
 .ag-daily a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
 
 .ag-qloo { flex: 1 1 100%; margin: 0 0 2px; display: flex; gap: 10px; align-items: baseline; font-size: 12.5px; line-height: 1.4; color: var(--w-text2); }
@@ -332,7 +332,8 @@
 
 .wz-acct { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--w-line2); color: var(--w-text) !important; font-size: 12.5px; font-weight: 700; text-decoration: none !important; white-space: nowrap; }
 .wz-acct:hover { background: var(--w-card2); }
-.ag-saved { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--w-muted); white-space: nowrap; }
+.ag-tune { position: relative; }
+.ag-saved { position: absolute; top: 8px; right: 14px; font-size: 11.5px; font-weight: 700; color: var(--w-muted); white-space: nowrap; }
 .ag-saved.saved { color: var(--w-green); }
 .ag-saved.error { color: var(--w-red); }
-.ag-saved + .ag-replace { margin-left: 0; }
+.ag-qloo { padding-right: 70px; }

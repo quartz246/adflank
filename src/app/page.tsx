@@ -17,7 +17,10 @@ export default async function Landing() {
         <a href="/" className="wz-logo"><span className="wz-mark">P</span>Poachly</a>
         <nav className="wz-top-r">
           {member ? (
-            <LogoutButton />
+            <>
+              <Link className="home-link" href="/campaigns">My campaigns</Link>
+              <LogoutButton />
+            </>
           ) : (
             <>
               <Link className="home-link" href="/login">Log in</Link>
