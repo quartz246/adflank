@@ -170,7 +170,7 @@ npm run e2e -- --brand Allbirds --competitors Nike,Adidas --country US --out <di
 | `PORT` | no | `3000` | |
 
 ## Try the hosted demo
-Open the live demo (link at the top), paste a brand's website (for example **tesla.com**, **hoka.com** or **warbyparker.com**) and press
+Open the live demo (link at the top), paste a brand's website (for example **allbirds.com**, **tesla.com** or **hoka.com**) and press
 **Find my competitors' customers**. No signup: a guest account holds the project, and you can claim it with an email and password later.
 The four steps run live; the campaign screen appears when the copy and images are ready.
 

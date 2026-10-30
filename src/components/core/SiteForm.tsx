@@ -7,8 +7,8 @@ export default function SiteForm({ big = true }: { big?: boolean }) {
   const [site, setSite] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  // Sites that give the richest runs (both rivals in Qloo, a real taste gap, 7-16 metros), checked live on 10-30.
-  const hint = useTypedHint(["tesla.com", "hoka.com", "warbyparker.com", "glossier.com", "liquiddeath.com"]);
+  // Sites that give rich runs (both rivals in Qloo, a real taste gap, 5-14 metros), checked live on 10-30.
+  const hint = useTypedHint(["allbirds.com", "tesla.com", "hoka.com"]);
   return (
     <form
       className={`siteform${big ? " big" : ""}`}
