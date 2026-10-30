@@ -208,7 +208,7 @@ export default function Wizard({ projectId, initial }: { projectId: number; init
           {done && !final && sel !== null && (
             <div className="wz-cta slim">
               <span>Keep Poachly watching {andList(v.comps.map((c) => c.name))} every day · {v.qlooCalls} cited Qloo calls</span>
-              <a className="wz-btn sm" href={`/go/${projectId}/campaign`}>Start campaign →</a>
+              <button type="button" className="wz-btn sm" onClick={() => setSel(4)}>Open the campaigns →</button>
             </div>
           )}
         </main>

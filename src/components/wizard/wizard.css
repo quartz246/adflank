@@ -459,3 +459,4 @@ html[data-design="5"] .home-roles { justify-content: flex-start; }
 
 .siteform-steps { display: block; margin-top: 10px; text-align: center; font-size: 13px; font-weight: 600; color: var(--w-muted, #a3abb2) !important; text-decoration: none !important; }
 .siteform-steps:hover { color: var(--w-text, #eef1f3) !important; text-decoration: underline !important; text-underline-offset: 3px; }
+button.wz-btn { border: 0; cursor: pointer; font: inherit; font-weight: 700; }

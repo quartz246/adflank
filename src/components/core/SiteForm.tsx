@@ -30,7 +30,6 @@ export default function SiteForm({ big = true }: { big?: boolean }) {
       <button className="btn large glow" disabled={busy}>{busy ? "Starting the agents…" : <>Find my competitors&apos; customers <span className="arrow" aria-hidden>→</span></>}</button>
       {err && <p className="err" role="alert">{err}</p>}
     </form>
-    <a className="siteform-steps" href={`/start${site.trim() ? `?site=${encodeURIComponent(site.trim())}` : ""}`}>or pick your rivals, market and budget step by step →</a>
     </>
   );
 }

@@ -9,5 +9,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
   const u = await currentUser();
   if (u && !isGuestUser(u)) redirect("/campaigns");
   const claim = Number((await searchParams).claim);
-  return <AuthShell mode="signup"><AuthForm mode="signup" next={isGuestUser(u) && Number.isInteger(claim) ? `/go/${claim}/campaign` : undefined} /></AuthShell>;
+  return <AuthShell mode="signup"><AuthForm mode="signup" next={isGuestUser(u) && Number.isInteger(claim) ? `/go/${claim}` : undefined} /></AuthShell>;
 }
