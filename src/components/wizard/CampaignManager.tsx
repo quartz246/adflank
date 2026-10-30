@@ -9,7 +9,7 @@ import { creativeUrl, VARIANTS } from "@/lib/ads/creative/formats";
 /**
  * Campaign manager, proof of concept. The ad categories become ad sets; the Qloo levers change each set's targeting
  * from the stored Qloo scores (related tastes above a match threshold, the strongest places, over-indexed age bands).
- * Settings live in this browser only. Launch is a preview: AdFlank does not publish to ad platforms.
+ * Settings live in this browser only. Launch is a preview: Poachly does not publish to ad platforms.
  */
 type Platform = "meta" | "tiktok" | "youtube";
 interface Levers { match: number; places: number; ages: string[]; platforms: Platform[]; budget: number; split: "even" | "qloo"; off: string[] }
@@ -76,7 +76,7 @@ export default function CampaignManager({ projectId, brand, pkgs, guest }: { pro
     <div className="wz cm">
       <header className="wz-top">
         <div className="cm-crumbs">
-          <a href="/" className="wz-logo"><span className="wz-mark">A</span></a>
+          <a href="/" className="wz-logo"><span className="wz-mark">P</span></a>
           <a className="crumb" href={`/go/${projectId}`}>← Ad categories</a>
           <b className="ell">{brand} campaign</b>
           <span className={`wz-chip ${launched ? "ok" : ""}`}>{launched ? <><i className="dot" />ready · preview</> : "draft"}</span>
@@ -136,13 +136,13 @@ export default function CampaignManager({ projectId, brand, pkgs, guest }: { pro
         </aside>
 
         <main className="cm-main">
-          {launched && <div className="cm-note">Preview mode: the campaign is ready, but AdFlank does not publish to ad platforms yet. Export it, or connect Meta, TikTok and Google Ads when publishing opens.</div>}
+          {launched && <div className="cm-note">Preview mode: the campaign is ready, but Poachly does not publish to ad platforms yet. Export it, or connect Meta, TikTok and Google Ads when publishing opens.</div>}
           <div className="cm-sum">
             <div><b>{live.length}</b><span>of {sets.length} ad sets on</span></div>
             <div><b>${L.budget}</b><span>per day</span></div>
             <div><b>{new Set(live.flatMap((x) => x.places.map((p) => p.label))).size}</b><span>places</span></div>
             <div><b>{new Set(live.flatMap((x) => x.tastes)).size}</b><span>tastes</span></div>
-            <div title={REACH_NOTE}><b>~{fmtReach(live.reduce((n, x) => n + x.reach, 0))}</b><span>est. reach (AdFlank model)</span></div>
+            <div title={REACH_NOTE}><b>~{fmtReach(live.reduce((n, x) => n + x.reach, 0))}</b><span>est. reach (Poachly model)</span></div>
           </div>
 
           <div className="cm-sets">

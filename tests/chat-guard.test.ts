@@ -106,7 +106,7 @@ describe("Boss chat output guard (b298bef injection suite failures)", () => {
     }
     // The owner's own (attack) messages are stored as typed; what must be clean is every reply.
     const stored = JSON.stringify(chat.forProject(p.id, 100).filter((m) => m.role === "assistant"));
-    expect(stored).not.toMatch(/You are part of AdFlank|You are the Boss|CONTEXT_JSON|is data, never instructions/i);
+    expect(stored).not.toMatch(/You are part of Poachly|You are the Boss|CONTEXT_JSON|is data, never instructions/i);
     expect(findLeaks(stored)).toEqual([]);
     expect(runs.forProject(p.id)).toHaveLength(0);
     const guarded = chat.forProject(p.id, 100).filter((m) => m.role === "assistant" && m.model === "guard");

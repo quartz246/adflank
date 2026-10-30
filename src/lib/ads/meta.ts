@@ -93,7 +93,7 @@ export function planMeta(pkg: AttackPackage, opts: { landingUrl?: string } = {})
   for (const w of [...places.cities, ...places.regions]) cites.push(w.cite);
 
   const input: MetaInput = {
-    campaignName: `AdFlank | ${b.brand} vs ${b.competitor}`.slice(0, 255),
+    campaignName: `Poachly | ${b.brand} vs ${b.competitor}`.slice(0, 255),
     objective: "OUTCOME_TRAFFIC",
     specialAdCategories: [],
     adSetName: `People like ${possessive(b.competitor)} customers`.slice(0, 255),

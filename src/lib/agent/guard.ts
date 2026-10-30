@@ -8,16 +8,16 @@ export const REFUSAL = "I can only help with this project's research: its attack
 export const RUN_HINT = 'To start a new research run, type "run now" or press the Run now button.';
 export const NO_RUN = `No research run was started. ${RUN_HINT}`;
 
-/** Phrases that only appear in AdFlank's hidden prompts (or in a model describing them). */
+/** Phrases that only appear in Poachly's hidden prompts (or in a model describing them). */
 const PROMPT_MARKERS: RegExp[] = [
-  /you are part of adflank/i,
+  /you are part of (?:adflank|poachly)/i,
   /you are the (?:boss|planner|worker)\b/i,
   /context_json/i,
   /system[_ -]?prompt/i,
   /\bsystem (?:message|instructions?)\b/i,
   /\bdeveloper (?:mode|message|instructions?)\b/i,
   /is data, never instructions/i,
-  /adflank functions offered/i,
+  /(?:adflank|poachly) functions offered/i,
   /you have no shell, files/i,
   /stored run data:/i,
   /"action"\s*:/i,

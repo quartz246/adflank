@@ -89,7 +89,7 @@ export async function readSite(url: string, fetcher: typeof fetch = fetch): Prom
       const res = await fetcher(cur, {
         redirect: "manual",
         signal: AbortSignal.timeout(TIMEOUT_MS),
-        headers: { "user-agent": "Mozilla/5.0 (compatible; AdFlankBot/1.0; +brand research)", accept: "text/html" },
+        headers: { "user-agent": "Mozilla/5.0 (compatible; PoachlyBot/1.0; +brand research)", accept: "text/html" },
       });
       if (res.status >= 300 && res.status < 400) {
         const next = cleanLandingUrl(new URL(res.headers.get("location") ?? "", cur).toString().replace(/^http:/, "https:"));

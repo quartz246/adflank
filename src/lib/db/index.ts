@@ -124,6 +124,11 @@ CREATE TABLE IF NOT EXISTS app_meta (
   k TEXT PRIMARY KEY,
   v TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS campaign_settings (
+  project_id INTEGER PRIMARY KEY REFERENCES projects(id) ON DELETE CASCADE,
+  json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS idx_entities_project ON entities(project_id);
 CREATE INDEX IF NOT EXISTS idx_runs_project ON runs(project_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_calls_run ON qloo_calls(run_id, n);

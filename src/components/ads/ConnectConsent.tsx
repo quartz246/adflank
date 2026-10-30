@@ -51,7 +51,7 @@ export default function ConnectConsent({ platform, backHref }: { platform: AdPla
           <span aria-hidden style={{ color: ui.muted }}>⇄</span>
           <span aria-hidden style={{ width: 36, height: 36, borderRadius: 8, background: "#111827", color: "#fff", display: "grid", placeItems: "center", fontWeight: 800 }}>{label.slice(0, 1)}</span>
         </div>
-        <h1 style={{ fontSize: 20, margin: "0 0 4px" }}>AdFlank wants to access your {label} Ads account</h1>
+        <h1 style={{ fontSize: 20, margin: "0 0 4px" }}>Poachly wants to access your {label} Ads account</h1>
         <p style={{ margin: "0 0 16px", fontSize: 14, color: ui.muted }}>
           So it can publish the templates it builds to reach people like your competitors&apos; customers. Everything is created paused.
         </p>

@@ -6,8 +6,8 @@ import "@/components/wizard/designs.css";
 import "@/components/wizard/mobile.css";
 
 export const metadata: Metadata = {
-  title: "AdFlank: an ad agency that works non-stop to win your competitors' customers",
-  description: "Paste your website. AdFlank's agents profile your competitors' fans on Qloo's taste graph, design a campaign for every segment and keep fighting for those customers every day.",
+  title: "Poachly: an ad agency that works non-stop to win your competitors' customers",
+  description: "Paste your website. Poachly's agents profile your competitors' fans on Qloo's taste graph, design a campaign for every segment and keep fighting for those customers every day.",
 };
 
 // viewport-fit=cover so env(safe-area-inset-*) is real on notched phones (mobile.css pads for it).

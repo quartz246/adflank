@@ -120,7 +120,7 @@ export default function AdsPanel({ pkg, templates, initialPlatform, initialPubli
           <aside style={{ flex: "1 1 300px", minWidth: 0, display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 14 }}>
             <PanelBlock title="Export">
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <button type="button" style={button()} onClick={() => download(`adflank_${t.platform}_${safeName(t.packageRunId)}.json`, JSON.stringify(t.json, null, 2), "application/json")}>
+                <button type="button" style={button()} onClick={() => download(`poachly_${t.platform}_${safeName(t.packageRunId)}.json`, JSON.stringify(t.json, null, 2), "application/json")}>
                   Download JSON
                 </button>
                 {CSV_PLATFORMS.includes(t.platform) && (t.csv ? (

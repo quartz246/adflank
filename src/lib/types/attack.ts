@@ -1,4 +1,4 @@
-// AdFlank shared contract between the core app (loop, board, DB) and the ad-templates module.
+// Poachly shared contract between the core app (loop, board, DB) and the ad-templates module.
 // Copy into the app as src/lib/types/attack.ts. Change it only by agreement (note the change in adflank/CONTRACT_LOG.md).
 
 /** Every claim in the product points to the Qloo call it came from. */

@@ -12,7 +12,7 @@ export default function AuthShell({ mode, children }: { mode: "login" | "signup"
       </TopBar>
       <div className="auth">
         <aside className="auth-side">
-          <p className="eyebrow" style={{ color: "#c4b5fd" }}>AdFlank</p>
+          <p className="eyebrow" style={{ color: "#c4b5fd" }}>Poachly</p>
           <h2>Your agent team for winning a competitor&apos;s customers.</h2>
           <ul>
             <li>Live Qloo taste data, every claim cited</li>

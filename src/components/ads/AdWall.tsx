@@ -255,7 +255,7 @@ export default function AdWall({ projectId, seg, index, total, copyData, onPrev,
             </div>
           )}
           <p className="aw-fine">
-            {copyData?.source === "glm" ? "Copy: AdFlank's copywriter agent (GLM)" : copyData?.pending ? "Copy: AdFlank's rule-based writer for now (the copywriter agent is still writing)" : "Copy: AdFlank's rule-based writer"}, checked against platform limits and a banned-phrase list.
+            {copyData?.source === "glm" ? "Copy: Poachly's copywriter agent (GLM)" : copyData?.pending ? "Copy: Poachly's rule-based writer for now (the copywriter agent is still writing)" : "Copy: Poachly's rule-based writer"}, checked against platform limits and a banned-phrase list.
             {kit ? (kit.colorSource === "default" ? ` ${kit.domain || "The site"} sets no brand colour, so the palette is neutral.` : ` Colours and icon from ${kit.domain}.`) : ""}
           </p>
         </aside>

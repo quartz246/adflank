@@ -1,4 +1,4 @@
-/* Website flow: dark two-pane wizard. Scoped to .wz so the rest of AdFlank keeps its light theme. */
+/* Website flow: dark two-pane wizard. Scoped to .wz so the rest of Poachly keeps its light theme. */
 .wz {
   --w-bg: #0b0d0e; --w-side: #101213; --w-card: #15181a; --w-card2: #1b1f22; --w-line: #24292d; --w-line2: #30363b;
   --w-text: #eef1f3; --w-text2: #b9c0c6; --w-muted: #a3abb2; --w-faint: #858e96;

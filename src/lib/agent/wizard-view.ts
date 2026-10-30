@@ -1,5 +1,5 @@
 import { isGuestUser } from "@/lib/auth/session";
-import { calls, entities, packages, runLog, runs, type CallRow, type ProjectRow, type UserRow } from "@/lib/db/repo";
+import { calls, campaignSettings, entities, packages, runLog, runs, type CallRow, type ProjectRow, type UserRow } from "@/lib/db/repo";
 import type { AttackPackage, PlatformTemplate } from "@/lib/types/attack";
 import { generateTemplates } from "@/lib/ads";
 import { sanitizeDeep } from "@/lib/util/sanitize";
@@ -91,6 +91,8 @@ export function wizardView(project: ProjectRow, user: UserRow) {
     terminal,
     qlooCalls: runCalls.filter((c) => c.ok).length,
     guest: isGuestUser(user),
+    // The owner's saved campaign choices (checked against the segment pool on the client by restoreSettings).
+    settings: safeJson(campaignSettings.get(project.id)?.json ?? null),
   });
   // Restore the validated public URL (sanitizeText would show it as "[url]").
   return { ...view, project: { ...view.project, url: landing }, site: view.site ? { ...view.site, url: landing ?? "" } : null };

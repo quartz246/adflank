@@ -1,4 +1,4 @@
-/** OpenAI-compatible chat shapes (the subset AdFlank uses). */
+/** OpenAI-compatible chat shapes (the subset Poachly uses). */
 export interface ToolCall {
   id: string;
   type: "function";

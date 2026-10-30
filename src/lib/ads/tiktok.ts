@@ -80,7 +80,7 @@ export function planTikTok(pkg: AttackPackage, opts: { landingUrl?: string } = {
   };
 
   const input: TikTokInput = {
-    campaignName: `AdFlank | ${b.brand} vs ${b.competitor}`.slice(0, 255),
+    campaignName: `Poachly | ${b.brand} vs ${b.competitor}`.slice(0, 255),
     objectiveType: "TRAFFIC",
     dailyBudget: 50,
     adgroupName: `People like ${possessive(b.competitor)} customers`.slice(0, 255),

@@ -13,8 +13,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Guests (pasted a website, no account) are sent to signup by each page, which keeps the project id for the claim.
   return (
     <>
-      <TopBar href="/projects">
-        <Link className="navlink hide-sm" href="/projects">Projects</Link>
+      <TopBar href="/campaigns">
+        <Link className="navlink hide-sm" href="/campaigns">My campaigns</Link>
         <span className="userchip" title={user.email}>
           <span className="avatar user" aria-hidden>{user.email.slice(0, 1).toUpperCase()}</span>
           <span className="email ellipsis">{user.email}</span>

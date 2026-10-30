@@ -14,7 +14,7 @@ export default function AuthForm({ mode, next }: { mode: "login" | "signup"; nex
     const r = await api(`/api/auth/${mode}`, { body: { email, password } });
     setBusy(false);
     if (!r.ok) return setError(r.data.error ?? "Something went wrong.");
-    window.location.href = next ?? "/projects";
+    window.location.href = next ?? "/campaigns";
   }
   return (
     <form onSubmit={submit} className="card stack" style={{ padding: 28 }}>

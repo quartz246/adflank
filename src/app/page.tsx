@@ -14,7 +14,7 @@ export default async function Landing() {
   return (
     <div className="wz home">
       <header className="wz-top">
-        <a href="/" className="wz-logo"><span className="wz-mark">A</span>AdFlank</a>
+        <a href="/" className="wz-logo"><span className="wz-mark">P</span>Poachly</a>
         <nav className="wz-top-r">
           {member ? (
             <LogoutButton />
@@ -29,10 +29,10 @@ export default async function Landing() {
 
       <main className="home-main">
         <h1>Get an ad agency that works non-stop to win your competitors&apos; customers.</h1>
-        <p className="home-sub">Paste your website. AdFlank&apos;s agents profile your rivals&apos; fans on Qloo&apos;s taste graph, design a campaign for every segment on Meta, TikTok and Google, and keep fighting for those customers every day.</p>
+        <p className="home-sub">Paste your website. Poachly&apos;s agents profile your rivals&apos; fans on Qloo&apos;s taste graph, design a campaign for every segment on Meta, TikTok and Google, and keep fighting for those customers every day.</p>
         <SiteForm />
         <div className="home-roles" aria-label="What it replaces">
-          <span className="lab">Qloo&apos;s taste graph does the research. Your AdFlank agency is the</span>
+          <span className="lab">Qloo&apos;s taste graph does the research. Your Poachly agency is the</span>
           {["Media planner", "Copywriter", "Ad designer", "Campaign manager"].map((r) => <span key={r} className="role">{r}</span>)}
         </div>
         <HomeSteps />

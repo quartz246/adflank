@@ -25,7 +25,7 @@ export interface BrandKit {
 const PAGE_BYTES = 350_000;
 const ICON_BYTES = 200_000;
 const TIMEOUT_MS = 5000;
-const UA = "Mozilla/5.0 (compatible; AdFlankBot/1.0; +brand research)";
+const UA = "Mozilla/5.0 (compatible; PoachlyBot/1.0; +brand research)";
 
 function privateIp(ip: string): boolean {
   if (isIP(ip) === 6) {

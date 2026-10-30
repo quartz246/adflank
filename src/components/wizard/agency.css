@@ -329,3 +329,10 @@
   .ag-launch { padding: 8px 14px; font-size: 13px; }
   .ag-wide { display: none; }
 }
+
+.wz-acct { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--w-line2); color: var(--w-text) !important; font-size: 12.5px; font-weight: 700; text-decoration: none !important; white-space: nowrap; }
+.wz-acct:hover { background: var(--w-card2); }
+.ag-saved { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--w-muted); white-space: nowrap; }
+.ag-saved.saved { color: var(--w-green); }
+.ag-saved.error { color: var(--w-red); }
+.ag-saved + .ag-replace { margin-left: 0; }

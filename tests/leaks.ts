@@ -1,6 +1,6 @@
 import os from "node:os";
 
-/** Strings that must never appear in anything AdFlank outputs (built from parts so the repo scan stays clean). */
+/** Strings that must never appear in anything Poachly outputs (built from parts so the repo scan stays clean). */
 export const FAKE_SECRETS = {
   GLM_API_KEY: "fake-glm-key-7c1d9e2a5b",
   QLOO_API_KEY: "fake-qloo-key-3f8e6a0c4d",

@@ -217,9 +217,9 @@ async function work(st: RunState, ctx: WorkerCtx, names: Map<string, string>, ph
         const g = gateToolCall(tc.function.name, tc.function.arguments, sink);
         if (g.ok && phase && !phase.tools.includes(g.name)) {
           sink({ tool: g.name, args: clip(tc.function.arguments, 400), decision: "dropped", reason: "not offered in this step" });
-          reply = JSON.stringify({ error: "dropped by AdFlank: that function is not offered in this step." });
+          reply = JSON.stringify({ error: "dropped by Poachly: that function is not offered in this step." });
         } else if (!g.ok) {
-          reply = JSON.stringify({ error: `dropped by AdFlank: ${g.reason}. Only the offered functions can be used.` });
+          reply = JSON.stringify({ error: `dropped by Poachly: ${g.reason}. Only the offered functions can be used.` });
         } else {
           llmCalls++;
           const args = canonicalise(g.args, names);

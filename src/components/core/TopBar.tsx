@@ -5,9 +5,9 @@ export default function TopBar({ href = "/", children }: { href?: string; childr
   return (
     <header className="topbar">
       <div className="topbar-inner">
-        <Link className="brand" href={href} aria-label="AdFlank home">
-          <span className="mark" aria-hidden>A</span>
-          <span>Ad<b>Flank</b></span>
+        <Link className="brand" href={href} aria-label="Poachly home">
+          <span className="mark" aria-hidden>P</span>
+          <span>Poach<b>ly</b></span>
         </Link>
         <nav className="nav">{children}</nav>
       </div>

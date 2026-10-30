@@ -1,4 +1,4 @@
-// AdFlank ad-templates module. Pure functions: no network, no env, no file access.
+// Poachly ad-templates module. Pure functions: no network, no env, no file access.
 import { z } from "zod";
 import type { AttackPackage, PlatformTemplate } from "@/lib/types/attack";
 import { contextFrom } from "./context";

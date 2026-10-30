@@ -6,7 +6,7 @@ import { clip, sanitizeDeep, sanitizeText } from "@/lib/util/sanitize";
 
 /**
  * The tool gate. GLM is offered exactly these functions and nothing else. Every call it asks for is
- * checked against this fixed allowlist and a strict zod schema before AdFlank runs it; anything else is
+ * checked against this fixed allowlist and a strict zod schema before Poachly runs it; anything else is
  * dropped and written to tool_audit. Results go back to GLM as slimmed, sanitised data.
  */
 

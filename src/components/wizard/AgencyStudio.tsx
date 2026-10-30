@@ -2,7 +2,9 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AttackPackage } from "@/lib/types/attack";
-import { adWorthy, BUDGET_NOTE, buildSegments, demoLabel, estimateReach, fmtReach, POOL_SEGMENTS, weeklyReach } from "@/lib/campaign/segments";
+import { BUDGET_NOTE, buildSegments, demoLabel, fmtReach, POOL_SEGMENTS } from "@/lib/campaign/segments";
+import { BANDS, budgetAt, MATCH, PLAT_LABEL, planCampaigns, restoreSettings, runsFor, SLIDER, type CampaignSettings, type Platform } from "@/lib/campaign/plan";
+import { api } from "@/components/core/api";
 import { cityCoords } from "@/lib/geo/cities";
 import type { HeatCell } from "@/lib/agent/wizard-view";
 import { possessive } from "@/lib/ads/copy";
@@ -51,43 +53,42 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: "google", label: "Google" },
 ];
 
-/** Budget thresholds and how many campaigns (segments) each one runs: more budget opens more cities and tastes. */
-const BUDGETS = [10, 25, 50, 100, 250, 500, 1000];
-const RUNS = [2, 3, 4, 5, 7, 9, 12];
-/** The slider glides on a log scale, $10 to $1,000 a day; positions 0..SLIDER map to round dollar amounts. */
-const SLIDER = 1000;
-const budgetAt = (pos: number) => {
-  const v = 10 * 100 ** (pos / SLIDER);
-  return v < 100 ? Math.round(v / 5) * 5 : Math.round(v / 10) * 10;
-};
-const runsFor = (budget: number) => RUNS[BUDGETS.reduce((at, b, n) => (budget >= b ? n : at), 0)];
-const BANDS = ["18-24", "25-34", "35-44", "45-54", "55+"];
-const MATCH = [
-  { id: "strict", label: "Strict", min: 0.8, note: "the segment's own taste only" },
-  { id: "balanced", label: "Balanced", min: 0.6, note: "plus related tastes these fans score 60+ on in Qloo" },
-  { id: "broad", label: "Broad", min: 0.35, note: "plus related tastes they score 35+ on" },
-] as const;
-type Platform = "meta" | "tiktok" | "google";
-const PLAT: Record<Platform, string> = { meta: "Meta", tiktok: "TikTok", google: "Google" };
 const TAB_PLATFORM: Record<Tab, Platform> = { feed: "meta", story: "meta", tiktok: "tiktok", google: "google" };
 
-export default function AgencyStudio({ pkgs, brand, start, focus, heat, scheduled }: { pkgs: AttackPackage[]; brand: string; start: string; focus?: { n: number; at: number } | null; heat: HeatCell[]; scheduled?: boolean }) {
+export default function AgencyStudio({ pkgs, brand, start, focus, heat, scheduled, settings }: { pkgs: AttackPackage[]; brand: string; start: string; focus?: { n: number; at: number } | null; heat: HeatCell[]; scheduled?: boolean; settings?: unknown }) {
   const projectId = Number(start.match(/\/go\/(\d+)/)?.[1] ?? 0);
   // The pool the agency draws from; campaign n on screen shows pool segment active[n] (its images use the pool index).
   const pool = useMemo(() => buildSegments(pkgs, brand, undefined, undefined, POOL_SEGMENTS), [pkgs, brand]);
   const data = useCampaignCopy(projectId);
-  const [pos, setPos] = useState(SLIDER / 2); // $100 a day
-  const [active, setActive] = useState<number[]>(() => pool.slice(0, runsFor(budgetAt(SLIDER / 2))).map((_, n) => n));
-  const [retired, setRetired] = useState<number[]>([]);
+  // The owner's saved choices, checked against this run's pool; the defaults ($100 a day, five campaigns) otherwise.
+  const [init] = useState<CampaignSettings>(() => restoreSettings(settings, pool));
+  const [pos, setPos] = useState(init.pos);
+  const [active, setActive] = useState<number[]>(init.active);
+  const [retired, setRetired] = useState<number[]>(init.retired);
   const [i, setI] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [tab, setTab] = useState<Tab>("feed");
-  const [picked, setPicked] = useState<Record<number, CreativeVariant>>({});
-  const [match, setMatch] = useState<(typeof MATCH)[number]["id"]>("balanced");
-  const [perSet, setPerSet] = useState(1);
-  const [ages, setAges] = useState<string[]>(() => [...new Set(pool.map((x) => x.demo.band))]);
-  const [plats, setPlats] = useState<Platform[]>(["meta", "tiktok", "google"]);
-  const [launched, setLaunched] = useState(false);
+  const [picked, setPicked] = useState<Record<number, CreativeVariant>>(() => Object.fromEntries(Object.entries(init.picked).map(([k, v]) => [Number(k), v])));
+  const [match, setMatch] = useState<CampaignSettings["match"]>(init.match);
+  const [perSet, setPerSet] = useState(init.perSet);
+  const [ages, setAges] = useState<CampaignSettings["ages"]>(init.ages);
+  const [plats, setPlats] = useState<Platform[]>(init.plats);
+  const [launched, setLaunched] = useState(init.launched);
+  // Save the choices (debounced) so they are there on the next visit and on the "My campaigns" page.
+  const [saved, setSaved] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    setSaved("saving");
+    const body: CampaignSettings = { v: 1, pos, active, retired, match, perSet, ages, plats, picked: Object.fromEntries(Object.entries(picked).map(([k, v]) => [String(k), v])), launched };
+    const t = setTimeout(() => {
+      void api(`/api/projects/${projectId}/campaign`, { method: "PUT", body }).then((r) => setSaved(r.ok ? "saved" : "error"));
+    }, 700);
+    return () => clearTimeout(t);
+  }, [projectId, pos, active, retired, match, perSet, ages, plats, picked, launched]);
 
   // More budget, more campaigns: grow from the unused pool (never-replaced segments first), or drop the last ones.
   const setBudget = (p: number) => {
@@ -111,21 +112,9 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus]);
 
-  const minMatch = MATCH.find((m) => m.id === match)!.min;
   const k = Math.min(i, active.length - 1);
-  const campaigns = active.map((n, pos) => {
-    const s = pool[n];
-    const tastes = [s.taste.label, ...s.related.filter((t) => t.score >= minMatch && adWorthy(t.label)).slice(0, 4).map((t) => t.label)];
-    const places = [s.place, ...s.places.filter((p) => p.label !== s.place.label)].slice(0, perSet);
-    const on = ages.includes(s.demo.band);
-    const size = estimateReach({ demo: s.demo, taste: { ...s.taste, score: Math.min(1, s.taste.score + (tastes.length - 1) * 0.08) } }, places);
-    return { n, pos, s, tastes, places, on, size };
-  });
-  const live = campaigns.filter((c) => c.on);
-  const budget = budgetAt(pos);
-  const sizeSum = live.reduce((a, c) => a + c.size, 0) || 1;
-  const reachOf = (c: (typeof campaigns)[number]) => (c.on ? weeklyReach(c.size, (budget * c.size) / sizeSum) : 0);
-  const total = live.reduce((a, c) => a + reachOf(c), 0);
+  const { campaigns, live, budget, total } = planCampaigns(pool, { pos, active, match, perSet, ages });
+  const reachOf = (c: (typeof campaigns)[number]) => c.reach;
   const cur = campaigns[k];
 
   // One pin per city across the running campaigns; a campaign's first place is its home pin.
@@ -265,7 +254,7 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
               <span>3 designs to test</span>
             </div>
           )}
-          <p className="ag-fine">{copy.source === "glm" ? "Copy by AdFlank's copywriter agent (GLM)" : data?.pending ? "The copywriter agent is still writing; rule-based copy for now" : "Copy by AdFlank's rule-based writer"}, checked against platform limits.</p>
+          <p className="ag-fine">{copy.source === "glm" ? "Copy by Poachly's copywriter agent (GLM)" : data?.pending ? "The copywriter agent is still writing; rule-based copy for now" : "Copy by Poachly's rule-based writer"}, checked against platform limits.</p>
         </aside>
       </div>
 
@@ -284,16 +273,17 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
         </div>
         <div className="ag-lever">
           <span className="lb" title="Dotted bands over-index among these fans in Qloo">Age focus</span>
-          <div className="ag-segctl multi">{BANDS.map((b) => <button key={b} type="button" className={`${ages.includes(b) ? "on" : ""}${pool.some((x) => x.demo.band === b) ? " q" : ""}`} onClick={() => setAges((a) => toggle(a, b))}>{b}</button>)}</div>
+          <div className="ag-segctl multi">{BANDS.map((b) => <button key={b} type="button" className={`${ages.includes(b) ? "on" : ""}${pool.some((x) => x.demo.band === b) ? " q" : ""}`} onClick={() => setAges((a) => toggle<CampaignSettings["ages"][number]>(a, b))}>{b}</button>)}</div>
         </div>
         <div className="ag-lever">
           <span className="lb">Platforms</span>
-          <div className="ag-segctl multi">{(Object.keys(PLAT) as Platform[]).map((p) => <button key={p} type="button" className={plats.includes(p) ? "on" : ""} onClick={() => setPlats((x) => toggle(x, p))}>{PLAT[p]}</button>)}</div>
+          <div className="ag-segctl multi">{(Object.keys(PLAT_LABEL) as Platform[]).map((p) => <button key={p} type="button" className={plats.includes(p) ? "on" : ""} onClick={() => setPlats((x) => toggle(x, p))}>{PLAT_LABEL[p]}</button>)}</div>
         </div>
+        {saved !== "idle" && <span className={`ag-saved ${saved}`} aria-live="polite">{saved === "saving" ? "Saving…" : saved === "saved" ? "✓ Saved" : "Not saved"}</span>}
         <button type="button" className="ag-replace" onClick={replace} disabled={!spare.length} title={spare.length ? "Swap this campaign for the next segment in Qloo's data" : "No more segments in Qloo's data for these competitors"}>↻ Replace<span className="ag-wide"> segment</span></button>
         <button type="button" className="ag-launch" disabled={!live.length || !plats.length} onClick={() => setLaunched(true)}>{launched ? "✓ Ready (preview)" : "Launch campaign →"}</button>
       </div>
-      {launched && <p className="ag-note">Preview: {live.length} campaigns are ready at ${budget.toLocaleString("en-US")}/day. AdFlank does not publish or spend yet; connecting Meta, TikTok and Google Ads comes after the hackathon. <a href={start}>Open the campaign manager →</a></p>}
+      {launched && <p className="ag-note">Preview: {live.length} campaigns are ready at ${budget.toLocaleString("en-US")}/day. Poachly does not publish or spend yet; connecting Meta, TikTok and Google Ads comes after the hackathon.</p>}
     </div>
   );
 }

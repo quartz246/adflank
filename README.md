@@ -1,10 +1,10 @@
-# AdFlank
+# Poachly
 
 **An ad agency that works non-stop to win your competitors' customers, powered by Qloo's taste graph.**
 
 Live demo: https://recordings-complete-workers-findarticles.trycloudflare.com
 
-Paste your website. AdFlank's agents read it, find your competitors on [Qloo](https://www.qloo.com/)'s taste graph, profile the
+Paste your website. Poachly's agents read it, find your competitors on [Qloo](https://www.qloo.com/)'s taste graph, profile the
 people who love those competitors (where they are, who they are, what they love, what they listen to and watch), and design a
 campaign for every segment of those fans on Meta, TikTok and Google. Then it keeps watching: a daily run re-reads the fans on Qloo, and
 new cities, ages and tastes become new campaigns. Nothing is published or spent: you review, tune and approve.
@@ -36,6 +36,11 @@ Every number cites the Qloo call it came from (`q_<run>_<n>`), and you can open 
      focus (over-indexed bands are marked), platforms, and **Replace segment** (swaps a campaign for the next segment in the data).
    - **Launch campaign** is a labelled preview: publishing to ad platforms comes after the hackathon.
 
+**My campaigns** (`/campaigns`): sign up, or claim the guest project with an email and password, and every brand you paste gets a
+card with its rivals, campaigns, daily budget, estimated weekly reach, cities, status and next daily check, plus totals across all of
+them, **Run again**, and the website box to start on a new rival. Your choices on the campaign screen (budget, levers, replaced
+segments, picked designs, launch preview) are saved per project and come back on the next visit.
+
 Logged-in projects also keep the original agent workspace: a Boss chat, a live board of the Planner's tasks and each Worker's Qloo calls,
 a daily scheduled run that is compared with the previous one ("vs last run"), and per-platform ad templates (Meta, TikTok, Google
 Responsive Search Ads) with mockups and CSV/JSON downloads.
@@ -50,13 +55,13 @@ Responsive Search Ads) with mockups and CSV/JSON downloads.
   upload.
 
 ## Known limits
-- Qloo describes **aggregate audience taste**, not people. AdFlank never has customer names or emails. It targets **people like the
+- Qloo describes **aggregate audience taste**, not people. Poachly never has customer names or emails. It targets **people like the
   competitor's customers**, and the app always words it that way.
 - **Small competitors may not be in Qloo.** Each one is checked with `qloo_describe` when it is added. If it isn't found, the app says so and
   suggests candidates or a bigger competitor; it is skipped in runs until it is resolved.
 - Qloo's trend data lags by several weeks, so the trend window ends about 60 days before the run. Day-to-day changes in "vs last run" are
   small, and "flat" is reported as flat.
-- `qloo_where_popular` returns coordinates. AdFlank labels each with the nearest large metro within 250 km. Points with no metro nearby are
+- `qloo_where_popular` returns coordinates. Poachly labels each with the nearest large metro within 250 km. Points with no metro nearby are
   shown as "near <lat>,<lon>" and left out of ad targeting, with a warning.
 - Demographics are Qloo's relative affinity index (about -1 to 1, above 0 = over-indexed), not population shares.
 - Qloo interest names don't always match an ad platform's targeting catalogue. Platform ids for interests and locations need a lookup at
@@ -71,7 +76,7 @@ Responsive Search Ads) with mockups and CSV/JSON downloads.
 ```mermaid
 flowchart LR
   B["Browser"] -->|HTTPS| APP
-  subgraph C["AdFlank container: non-root, read-only filesystem"]
+  subgraph C["Poachly container: non-root, read-only filesystem"]
     APP["Next.js app: auth, projects, live board (SSE), Boss chat, ads pages"]
     SCH["Daily scheduler"] --> LOOP
     APP --> LOOP["Agent loop: Planner, one Worker per competitor, Composer"]
@@ -96,7 +101,7 @@ flowchart LR
   - The model then writes the copy angles, which must be grounded in a gap or interest.
   - The **Boss chat** answers from stored run data and is offered no tools at all. Typing "run now" starts a run, within limits.
 - **Model**: built for **GLM-5.3-Flash** through Z.ai's OpenAI-compatible API with function calling. When the provider returns a quota or
-  capacity error, AdFlank falls back automatically to `glm-4.7-flash`, then `glm-4.5-flash`. The run page (and `/api/health`) shows which
+  capacity error, Poachly falls back automatically to `glm-4.7-flash`, then `glm-4.5-flash`. The run page (and `/api/health`) shows which
   model actually ran and why it fell back.
 - **Ad templates** (`src/lib/ads`): pure functions from an attack package to platform JSON/CSV, with limits as typed issues and a source
   URL for each limit in the code.
@@ -106,9 +111,9 @@ flowchart LR
 
 ### Security design
 The language model is treated as untrusted input.
-- The model only receives the prompt text AdFlank sends over the API, built from project data. It has **no shell, file, browser or
+- The model only receives the prompt text Poachly sends over the API, built from project data. It has **no shell, file, browser or
   network tools**.
-- The only tools it is offered are AdFlank's own functions, the seven allowlisted Qloo calls. Every call it asks for is checked against the
+- The only tools it is offered are Poachly's own functions, the seven allowlisted Qloo calls. Every call it asks for is checked against the
   fixed allowlist and its arguments against a strict zod schema before anything runs. Unknown tools and invalid arguments are dropped and
   written to an audit table, and the board shows how many were dropped.
 - Tool results go back to the model as slimmed data. Error text and Qloo results are sanitised (keys, paths, addresses and host names
@@ -126,17 +131,17 @@ The language model is treated as untrusted input.
 
 ### Docker
 ```bash
-docker build -t adflank .
-docker volume create adflank-data
+docker build -t poachly .
+docker volume create poachly-data
 # Live mode needs both keys in your shell; leave them unset to run on synthetic data with the labelled mock model.
 export QLOO_API_KEY=...   # Qloo hackathon API key
 export GLM_API_KEY=...    # Z.ai API key
-docker run -d --name adflank -p 127.0.0.1:3000:3000 \
+docker run -d --name poachly -p 127.0.0.1:3000:3000 \
   --read-only --tmpfs /tmp:rw,size=64m --tmpfs /app/.next/cache:rw,size=64m,uid=10001,gid=10001 \
-  -v adflank-data:/data --user 10001:10001 \
+  -v poachly-data:/data --user 10001:10001 \
   --cap-drop ALL --security-opt no-new-privileges --memory 1g --pids-limit 256 \
   -e QLOO_API_KEY -e GLM_API_KEY \
-  adflank
+  poachly
 ```
 Open http://127.0.0.1:3000 and paste a website (or sign up and add a brand and competitors yourself). `GET /api/health` shows the configured model, the model that last
 ran, and whether Qloo is live or mocked.

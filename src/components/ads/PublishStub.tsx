@@ -8,7 +8,7 @@ import { button, ui } from "./styles";
 export const PUBLISH_NOTE = "Publishing launches after the hackathon";
 
 /**
- * The Publish button, wired to a stub: it shows the payload AdFlank would send and makes NO
+ * The Publish button, wired to a stub: it shows the payload Poachly would send and makes NO
  * network call. Real publishing (platform APIs over OAuth) comes after the hackathon.
  */
 export default function PublishStub({ template, initialOpen = false }: { template: PlatformTemplate; initialOpen?: boolean }) {
@@ -31,7 +31,7 @@ export default function PublishStub({ template, initialOpen = false }: { templat
             {PUBLISH_NOTE}
           </div>
           <div style={{ padding: "8px 12px", fontSize: 13, color: ui.ink }}>
-            Nothing was sent. This is the payload AdFlank will send to the {label} Ads API once your account is connected.
+            Nothing was sent. This is the payload Poachly will send to the {label} Ads API once your account is connected.
             Everything is created PAUSED so you review it in {label} Ads before it spends.
             {recordedAt && <span style={{ color: ui.muted }}> Recorded locally at {recordedAt}.</span>}
           </div>

@@ -137,8 +137,9 @@ export default function Wizard({ projectId, initial }: { projectId: number; init
   return (
     <div className="wz">
       <header className="wz-top">
-        <a href="/" className="wz-logo"><span className="wz-mark">A</span>AdFlank</a>
+        <a href="/" className="wz-logo"><span className="wz-mark">P</span>Poachly</a>
         <div className="wz-top-r">
+          {v.guest ? <a className="wz-acct" href={`/signup?claim=${projectId}`}>Save your campaigns</a> : <a className="wz-acct" href="/campaigns">My campaigns</a>}
           {v.run.startedAt && <Clock start={v.run.startedAt} end={done || v.run.status === "failed" ? v.run.finishedAt : null} />}
           {done ? <span className="wz-chip ok"><i className="dot" />Campaign ready</span> : v.run.status === "failed" ? <span className="wz-chip bad">Run stopped</span> : v.ahead > 0 ? <span className="wz-chip"><i className="spin" />In line · starting soon</span> : <span className="wz-chip"><i className="spin" />Step {activeStage} of 4</span>}
         </div>
@@ -200,13 +201,13 @@ export default function Wizard({ projectId, initial }: { projectId: number; init
               ? <FanProfile comps={v.comps.map((c) => ({ name: c.name, done: c.done, pkg: c.pkg as AttackPackage, heat: c.heat }))} ci={ci} onPick={setCi} brand={v.brand?.name ?? v.project.name} country={v.project.country ?? "US"} designing={!campaignReady && steps[5]?.status === "working"} projectId={projectId} ready={campaignReady} onOpen={(n) => { setFocusSeg({ n, at: Date.now() }); setSel(4); }} />
               : steps.slice(2, 5).every((r) => r.status === "skipped") ? <div className="wz-card muted">{steps[2].note}</div> : <Skeleton />)}
             {shownStage === 4 && (campaignReady && v.comps.length
-              ? <AgencyStudio pkgs={v.comps.map((c) => c.pkg as AttackPackage)} brand={v.brand?.name ?? v.project.name} start={`/go/${projectId}/campaign`} focus={focusSeg} heat={v.comps.flatMap((c) => c.heat)} scheduled={"scheduled" in v.project ? v.project.scheduled : undefined} />
+              ? <AgencyStudio pkgs={v.comps.map((c) => c.pkg as AttackPackage)} brand={v.brand?.name ?? v.project.name} start={`/go/${projectId}/campaign`} focus={focusSeg} heat={v.comps.flatMap((c) => c.heat)} scheduled={"scheduled" in v.project ? v.project.scheduled : undefined} settings={v.settings} />
               : <Skeleton rows={4} />)}
           </div>
 
           {done && !final && sel !== null && (
             <div className="wz-cta slim">
-              <span>Keep AdFlank watching {v.comps.map((c) => c.name).join(" and ")} every day · {v.qlooCalls} cited Qloo calls</span>
+              <span>Keep Poachly watching {v.comps.map((c) => c.name).join(" and ")} every day · {v.qlooCalls} cited Qloo calls</span>
               <a className="wz-btn sm" href={`/go/${projectId}/campaign`}>Start campaign →</a>
             </div>
           )}
@@ -280,12 +281,12 @@ function StepMarket({ v, st, onPick }: { v: Full; st: StepRow; onPick: (i: numbe
       {v.market?.kind === "proxy" ? (
         <p className="lede">
           {possessive(v.brand?.name ?? "")} buyers also shop with big brands, so the agent picked the brands whose fans are the people {v.brand?.name} wants.
-          AdFlank profiles the customers of:
+          Poachly profiles the customers of:
         </p>
       ) : (
         <p className="lede">
           {v.market?.pool ? `Qloo returned ${v.market.pool} brands that ${possessive(v.brand?.name ?? "")} fans also like. ` : ""}
-          The agent kept the direct competitors. AdFlank will go after the customers of:
+          The agent kept the direct competitors. Poachly will go after the customers of:
         </p>
       )}
       <div className="wz-grid">

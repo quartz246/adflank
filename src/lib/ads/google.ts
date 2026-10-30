@@ -103,7 +103,7 @@ export function planGoogle(pkg: AttackPackage, opts: { landingUrl?: string } = {
   for (const x of [...segInterests, ...segGaps]) cites.push(x.cite);
 
   const input: GoogleInput = {
-    campaignName: `AdFlank | ${b.brand} vs ${b.competitor} | Search`.slice(0, 255),
+    campaignName: `Poachly | ${b.brand} vs ${b.competitor} | Search`.slice(0, 255),
     adGroupName: `People like ${possessive(b.competitor)} customers`.slice(0, 255),
     dailyBudget: 20,
     headlines,
@@ -182,7 +182,7 @@ export function buildGoogle(raw: GoogleInput, ctx: BuildContext): PlatformTempla
     keywords: input.keywords.map((k) => ({ text: k.text, match_type: matchType(k.match), negative: k.negative })),
     audience_segments: [{
       type: "CUSTOM_SEGMENT",
-      name: `AdFlank: ${peopleLike(ctx.competitor)}`.slice(0, 255),
+      name: `Poachly: ${peopleLike(ctx.competitor)}`.slice(0, 255),
       members: input.segmentSeeds.map((s) => ({ keyword: s })),
     }],
     adflank: { audience: peopleLike(ctx.competitor), brand: ctx.brand, competitor: ctx.competitor, cites: ctx.cites },

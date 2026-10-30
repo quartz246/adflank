@@ -131,6 +131,13 @@ export const calls = {
   byCite: (cite: string) => one<CallRow>(db().prepare("SELECT * FROM qloo_calls WHERE cite_id = ?").get(cite)),
 };
 
+/** The owner's campaign choices per project (budget, segments, levers): one JSON document, validated by lib/campaign/plan. */
+export const campaignSettings = {
+  get: (projectId: number) => one<{ json: string; updated_at: string }>(db().prepare("SELECT json, updated_at FROM campaign_settings WHERE project_id = ?").get(projectId)),
+  set: (projectId: number, json: string) =>
+    void db().prepare("INSERT INTO campaign_settings (project_id, json, updated_at) VALUES (?, ?, ?) ON CONFLICT(project_id) DO UPDATE SET json = excluded.json, updated_at = excluded.updated_at").run(projectId, json, nowIso()),
+};
+
 export const packages = {
   insert(runId: string, projectId: number, pkg: AttackPackage, copySource: string): void {
     db().prepare("INSERT INTO packages (run_id, project_id, competitor, package_json, copy_source, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(runId, projectId, pkg.competitor.name, JSON.stringify(pkg), copySource, nowIso());

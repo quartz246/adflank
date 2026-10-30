@@ -52,7 +52,7 @@ export default function GoogleSerp({ template, brand }: { template: PlatformTemp
           </ul>
           {v.segment.members.length > 0 && (
             <p style={{ margin: "0 0 10px" }}>
-              <strong>Audience segment</strong> <span style={{ color: ui.muted }}>(custom segment: {v.segment.name.replace(/^AdFlank: /, "")})</span>
+              <strong>Audience segment</strong> <span style={{ color: ui.muted }}>(custom segment: {v.segment.name.replace(/^Poachly: /, "")})</span>
               <br />{v.segment.members.join(", ")}
             </p>
           )}
