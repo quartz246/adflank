@@ -51,9 +51,16 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: "google", label: "Google" },
 ];
 
-/** The budget steps and how many campaigns (segments) each one runs: more budget opens more cities and tastes. */
+/** Budget thresholds and how many campaigns (segments) each one runs: more budget opens more cities and tastes. */
 const BUDGETS = [10, 25, 50, 100, 250, 500, 1000];
 const RUNS = [2, 3, 4, 5, 7, 9, 12];
+/** The slider glides on a log scale, $10 to $1,000 a day; positions 0..SLIDER map to round dollar amounts. */
+const SLIDER = 1000;
+const budgetAt = (pos: number) => {
+  const v = 10 * 100 ** (pos / SLIDER);
+  return v < 100 ? Math.round(v / 5) * 5 : Math.round(v / 10) * 10;
+};
+const runsFor = (budget: number) => RUNS[BUDGETS.reduce((at, b, n) => (budget >= b ? n : at), 0)];
 const BANDS = ["18-24", "25-34", "35-44", "45-54", "55+"];
 const MATCH = [
   { id: "strict", label: "Strict", min: 0.8, note: "the segment's own taste only" },
@@ -69,8 +76,8 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
   // The pool the agency draws from; campaign n on screen shows pool segment active[n] (its images use the pool index).
   const pool = useMemo(() => buildSegments(pkgs, brand, undefined, undefined, POOL_SEGMENTS), [pkgs, brand]);
   const data = useCampaignCopy(projectId);
-  const [bi, setBi] = useState(3);
-  const [active, setActive] = useState<number[]>(() => pool.slice(0, RUNS[3]).map((_, n) => n));
+  const [pos, setPos] = useState(SLIDER / 2); // $100 a day
+  const [active, setActive] = useState<number[]>(() => pool.slice(0, runsFor(budgetAt(SLIDER / 2))).map((_, n) => n));
   const [retired, setRetired] = useState<number[]>([]);
   const [i, setI] = useState(0);
   const [zoom, setZoom] = useState(false);
@@ -83,16 +90,17 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
   const [launched, setLaunched] = useState(false);
 
   // More budget, more campaigns: grow from the unused pool (never-replaced segments first), or drop the last ones.
-  const setBudget = (b: number) => {
-    setBi(b);
+  const setBudget = (p: number) => {
+    setPos(p);
+    const want = Math.min(runsFor(budgetAt(p)), pool.length);
+    if (want === active.length) return; // between thresholds only the dollar figures move
     setActive((cur) => {
-      const want = Math.min(RUNS[b], pool.length);
       if (cur.length >= want) return cur.slice(0, want);
       const free = pool.map((_, n) => n).filter((n) => !cur.includes(n));
       const fresh = [...free.filter((n) => !retired.includes(n)), ...free.filter((n) => retired.includes(n))];
       return [...cur, ...fresh.slice(0, want - cur.length)];
     });
-    setI((x) => Math.min(x, Math.min(RUNS[b], pool.length) - 1));
+    setI((x) => Math.min(x, want - 1));
   };
   // Opened from a city on the profile map: show that campaign, zoomed to its city.
   useEffect(() => {
@@ -114,7 +122,7 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
     return { n, pos, s, tastes, places, on, size };
   });
   const live = campaigns.filter((c) => c.on);
-  const budget = BUDGETS[bi];
+  const budget = budgetAt(pos);
   const sizeSum = live.reduce((a, c) => a + c.size, 0) || 1;
   const reachOf = (c: (typeof campaigns)[number]) => (c.on ? weeklyReach(c.size, (budget * c.size) / sizeSum) : 0);
   const total = live.reduce((a, c) => a + reachOf(c), 0);
@@ -184,8 +192,8 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
           <p className="ag-daily"><i />The agents work daily: they re-read {list(comps.map((c) => possessive(c)))} fans on Qloo, uncover new segments and create ads for them.{scheduled === false && <> <a href={`/signup?claim=${projectId}`}>Sign up free to keep them working</a>.</>}</p>
         </div>
         <div className="ag-budget">
-          <label htmlFor="ag-b">Daily budget <b>${budget.toLocaleString("en-US")}</b><span>/day · {Math.min(RUNS[bi], pool.length)} campaigns</span></label>
-          <input id="ag-b" type="range" min={0} max={BUDGETS.length - 1} step={1} value={bi} onChange={(e) => setBudget(Number(e.target.value))} aria-valuetext={`$${budget} a day`} />
+          <label htmlFor="ag-b">Daily budget <b>${budget.toLocaleString("en-US")}</b><span>/day · {active.length} campaigns</span></label>
+          <input id="ag-b" type="range" min={0} max={SLIDER} step={1} value={pos} onChange={(e) => setBudget(Number(e.target.value))} aria-valuetext={`$${budget} a day`} style={{ "--p": `${(pos / SLIDER) * 100}%` } as React.CSSProperties} />
           <p title={BUDGET_NOTE}>≈ <b>{fmtReach(total)}</b> people a week <span className="ag-q">?</span></p>
         </div>
       </div>

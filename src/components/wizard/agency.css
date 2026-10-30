@@ -245,7 +245,15 @@
 .ag-budget label { font-size: 12px; color: #d9d6e4; }
 .ag-budget label b { font-size: 16px; color: #fff; margin-left: 4px; }
 .ag-budget label span { color: #a9a6c4; }
-.ag-budget input { width: 100%; accent-color: #4ade80; margin: 2px 0; cursor: pointer; }
+/* custom track: the filled part runs exactly to the thumb (--p), so at the maximum the whole line is filled */
+.ag-budget input { -webkit-appearance: none; appearance: none; width: 100%; height: 18px; margin: 2px 0; background: transparent; cursor: pointer; }
+.ag-budget input:focus { outline: none; box-shadow: none; }
+.ag-budget input:focus-visible { outline: 2px solid #4ade80; outline-offset: 3px; border-radius: 9px; }
+.ag-budget input::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(to right, #4ade80 var(--p), rgba(255, 255, 255, .18) var(--p)); }
+.ag-budget input::-moz-range-track { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .18); }
+.ag-budget input::-moz-range-progress { height: 6px; border-radius: 3px; background: #4ade80; }
+.ag-budget input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 50%; background: #fff; border: 3px solid #4ade80; box-shadow: 0 2px 8px rgba(0, 0, 0, .35); }
+.ag-budget input::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid #4ade80; box-shadow: 0 2px 8px rgba(0, 0, 0, .35); }
 .ag-budget p { margin: 0; font-size: 12.5px; color: #d9d6e4; cursor: help; }
 .ag-budget p b { color: #4ade80; font-size: 15px; }
 .ag-reachline { margin: 0; padding: 8px 10px; border-radius: 10px; background: var(--w-green-soft); color: var(--w-text2); font-size: 12.5px; line-height: 1.4; cursor: help; }
