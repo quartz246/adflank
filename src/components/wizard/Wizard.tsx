@@ -21,7 +21,7 @@ type StepRow = Full["steps"][number];
 const STAGES = [
   { n: [1], title: "", role: "the brand strategist's job" },
   { n: [2], title: "", role: "the market scout's job" },
-  { n: [3, 4, 5], title: "Profile their fans", role: "Qloo's taste graph does the research" },
+  { n: [3, 4, 5], title: "Profiling their fans", role: "Qloo's taste graph does the research" },
   { n: [6], title: "Campaigns for every segment", role: "media planner, copywriter, designer and campaign manager in one" },
 ] as const;
 const stageOf = (n: number) => (n <= 2 ? n : n <= 5 ? 3 : 4);

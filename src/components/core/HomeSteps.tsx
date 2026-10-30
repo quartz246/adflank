@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 
 const STEPS = [
-  { title: "Read your website", line: "opening yourbrand.com · reading what the homepage sells" },
-  { title: "Find your competitors", line: "asking Qloo which brands your fans also like · picking your direct competitors" },
-  { title: "Profile their fans", line: "mapping where their fans are · their age skew, tastes, podcasts and shows" },
+  { title: "Learning about your website", line: "opening yourbrand.com · reading what the homepage sells" },
+  { title: "Finding your competitors", line: "asking Qloo which brands your fans also like · picking your direct competitors" },
+  { title: "Profiling their fans", line: "mapping where their fans are · their age skew, tastes, podcasts and shows" },
   { title: "A campaign per segment", line: "writing Meta, TikTok and Google ads for every segment of their fans" },
   { title: "Keep fighting, every day", line: "re-reading their fans on Qloo daily · new segments become new campaigns" },
 ];

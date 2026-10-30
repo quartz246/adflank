@@ -14,10 +14,10 @@ import { resolveEntity } from "./resolve";
  */
 export const SITE_TRIGGER = "site";
 export const WIZ_STEPS = [
-  { n: 1, key: "site", title: "Read your website" },
-  { n: 2, key: "market", title: "Find your competitors" },
+  { n: 1, key: "site", title: "Learning about your website" },
+  { n: 2, key: "market", title: "Finding your competitors" },
   { n: 3, key: "where", title: "Map where their fans are" },
-  { n: 4, key: "who", title: "Profile their fans" },
+  { n: 4, key: "who", title: "Profiling their fans" },
   { n: 5, key: "gap", title: "Find the switching gap" },
   { n: 6, key: "ads", title: "Design your campaign" },
 ] as const;
