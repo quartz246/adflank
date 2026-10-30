@@ -278,8 +278,8 @@ function StepMarket({ v, st, onPick }: { v: Full; st: StepRow; onPick: (i: numbe
   if (!v.comps.length) return st.status === "done" || st.status === "skipped" ? <div className="wz-card">The agent could not pick a competitor for this brand yet.</div> : <Skeleton rows={3} />;
   return (
     <div className="stack">
-      {v.market?.source === "picked by you" ? (
-        <p className="lede">You picked the rivals. Poachly&apos;s agents go after the customers of:</p>
+      {v.market?.source === "set before the run" ? (
+        <p className="lede">The rivals were set for this brand. Poachly&apos;s agents go after the customers of:</p>
       ) : v.market?.kind === "proxy" ? (
         <p className="lede">
           {possessive(v.brand?.name ?? "")} buyers also shop with big brands, so the agent picked the brands whose fans are the people {v.brand?.name} wants.

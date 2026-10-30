@@ -47,9 +47,19 @@ export async function POST(req: Request) {
   const rlim = allowRun(user.id, ip, false);
   if (!rlim.ok) return json({ error: rlim.message }, 429);
 
-  const project = projects.create(user.id, domainOf(url), p.data.countryCode ?? "US", null);
+  // A brand is one project per owner: the same website again re-runs it (with any newly picked rivals) instead of duplicating it.
+  const domain = domainOf(url);
+  const existing = projects.forUser(user.id).find((x) => {
+    try {
+      return x.landing_url ? domainOf(x.landing_url) === domain : x.name === domain;
+    } catch {
+      return false;
+    }
+  });
+  const project = existing ?? projects.create(user.id, domain, p.data.countryCode ?? "US", null);
   // Guest projects do not run daily on their own; signing up turns the schedule on.
-  projects.update(project.id, { landing_url: url, schedule_daily: isGuestUser(user) ? 0 : 1 });
+  projects.update(project.id, { landing_url: url, schedule_daily: isGuestUser(user) ? 0 : 1, ...(existing && p.data.countryCode ? { country_code: p.data.countryCode } : {}) });
+  if (existing && p.data.competitors?.length) for (const e of entities.forProject(project.id).filter((x) => x.role === "competitor")) entities.remove(e.id);
   // Rivals the owner picked are set before the run; the agents then skip choosing and profile these.
   for (const c of p.data.competitors ?? []) {
     const e = entities.add(project.id, "competitor", c.name);

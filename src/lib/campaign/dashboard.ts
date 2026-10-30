@@ -43,7 +43,18 @@ function events(now: number): Dashboard["events"] {
 }
 
 export function buildDashboard(user: UserRow, now = Date.now()): Dashboard {
-  const brands = projects.forUser(user.id).map(projectSummary);
+  // One entry per brand (its website): the most recent project stands for it; every project of that brand counts toward its activity.
+  const all = projects.forUser(user.id).map(projectSummary);
+  const brands: ProjectSummary[] = [];
+  const brandOf = new Map<number, number>(); // project id -> id of the project shown for its brand
+  for (const p of [...all].sort((a, b) => b.at.localeCompare(a.at))) {
+    const shown = brands.find((b) => b.domain === p.domain);
+    if (shown) brandOf.set(p.id, shown.id);
+    else {
+      brands.push(p);
+      brandOf.set(p.id, p.id);
+    }
+  }
   const start = Date.parse(dayKey(now)) - 6 * DAY;
   const days = Array.from({ length: 7 }, (_, i) => {
     const t = start + i * DAY;
@@ -60,13 +71,16 @@ export function buildDashboard(user: UserRow, now = Date.now()): Dashboard {
     if (d === undefined) continue;
     const slot = Math.floor(new Date(t).getUTCHours() / 2);
     heat.all[d][slot]++;
-    (heat[String(c.project_id)] ??= empty())[d][slot]++;
+    (heat[String(brandOf.get(c.project_id) ?? c.project_id)] ??= empty())[d][slot]++;
     calls[d]++;
   }
   const runRows = activity.runs(user.id, 60);
   const runsPerDay = days.map(() => 0);
   const segments = days.map(() => 0);
-  const byId = new Map(brands.map((b) => [b.id, b]));
+  const byId = new Map(all.map((b) => [b.id, byIdShown(b.id)]));
+  function byIdShown(id: number) {
+    return brands.find((b) => b.id === brandOf.get(id)) ?? all.find((b) => b.id === id)!;
+  }
   for (const r of runRows) {
     const d = idx.get(dayKey(Date.parse(r.started_at)));
     if (d === undefined) continue;
