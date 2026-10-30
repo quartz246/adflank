@@ -37,6 +37,7 @@ export function projectSummary(p: ProjectRow) {
       reach: plan.total,
       cities: plan.cities,
       tastes: plan.live.slice(0, 4).map((c) => c.s.taste.label),
+      items: plan.live.map((c) => ({ rival: c.s.comp, taste: c.s.taste.label, city: c.places[0]?.label ?? "", band: c.s.demo.band, gender: c.s.demo.gender, reach: c.reach })),
       thumbs: plan.live.slice(0, 4).map((c) => ({ n: c.n, v: s.picked[String(c.n)] ?? VARIANTS[c.n % VARIANTS.length] })),
       platforms: s.plats,
       launched: s.launched,

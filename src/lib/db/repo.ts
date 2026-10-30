@@ -131,6 +131,16 @@ export const calls = {
   byCite: (cite: string) => one<CallRow>(db().prepare("SELECT * FROM qloo_calls WHERE cite_id = ?").get(cite)),
 };
 
+/** Account-wide activity for the dashboard: every Qloo call and run of the owner's projects since a time. */
+export const activity = {
+  calls: (userId: number, since: string) =>
+    many<{ at: string; project_id: number; competitor: string | null; tool: string; ok: number }>(
+      db().prepare("SELECT q.at, r.project_id, q.competitor, q.tool, q.ok FROM qloo_calls q JOIN runs r ON r.id = q.run_id JOIN projects p ON p.id = r.project_id WHERE p.user_id = ? AND q.at >= ? ORDER BY q.at").all(userId, since),
+    ),
+  runs: (userId: number, limit = 40) =>
+    many<RunRow>(db().prepare("SELECT r.* FROM runs r JOIN projects p ON p.id = r.project_id WHERE p.user_id = ? ORDER BY r.started_at DESC LIMIT ?").all(userId, limit)),
+};
+
 /** The owner's campaign choices per project (budget, segments, levers): one JSON document, validated by lib/campaign/plan. */
 export const campaignSettings = {
   get: (projectId: number) => one<{ json: string; updated_at: string }>(db().prepare("SELECT json, updated_at FROM campaign_settings WHERE project_id = ?").get(projectId)),

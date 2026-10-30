@@ -41,9 +41,10 @@ then tick up to two rivals from the brands Qloo says your fans also love (or sea
 focus, then platforms and daily budget, with an agency brief filling in beside it. Every step can be skipped and the agents decide.
 The rivals you pick are set before the run, so the agents go straight to profiling their fans.
 
-**My campaigns** (`/campaigns`): sign up, or claim the guest project with an email and password, and every brand you paste gets a
-card with its rivals, campaigns, daily budget, estimated weekly reach, cities, status and next daily check, plus totals across all of
-them, **Run again**, and the website box to start on a new rival. Your choices on the campaign screen (budget, levers, replaced
+**My campaigns** (`/campaigns`): sign up, or claim the guest project with an email and password, and you get an agency dashboard
+across all your brands: the agents' Qloo activity by day and 2-hour slot with an activity log, daily Qloo calls, runs and campaigns
+built, a flow from each rival's fans through their Qloo tastes to the campaigns' cities (widths = weekly reach), reach per brand,
+the age groups targeted, a to-do list from your plans, upcoming retail dates, and a card per brand with **Run again**. Your choices on the campaign screen (budget, levers, replaced
 segments, picked designs, launch preview) are saved per project and come back on the next visit.
 
 Logged-in projects also keep the original agent workspace: a Boss chat, a live board of the Planner's tasks and each Worker's Qloo calls,
