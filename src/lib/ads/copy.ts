@@ -1,10 +1,17 @@
 import type { AttackPackage, GapHook, Interest } from "@/lib/types/attack";
 import { textLength } from "./limits";
 import { dedupe, mentions } from "./validate";
+import { isClean, type FilterContext } from "./creative/banned";
 
 /** The product's audience wording: Qloo is aggregate taste, never a customer list. */
 export function peopleLike(competitor: string): string {
-  return `people like ${competitor}'s customers`;
+  return `people like ${possessive(competitor)} customers`;
+}
+
+/** "Acme" -> "Acme's"; "Rothy's" stays "Rothy's" (no "Rothy's's"); "Bombas" -> "Bombas'". */
+export function possessive(name: string): string {
+  const n = name.trim();
+  return /['’]s$/i.test(n) ? n : /s$/i.test(n) ? `${n}'` : `${n}'s`;
 }
 
 /**
@@ -116,6 +123,8 @@ export interface CopyBank {
   interests: Interest[];      // highest affinity first, targetable only
   angles: string[];           // LLM-written angles, cleaned, without the competitor's name
   topCity?: string;
+  /** Copy-rule context: competitor names forbidden, Qloo labels and the brand grounded. */
+  filter: FilterContext;
 }
 
 /** The raw material every platform's copy is built from. */
@@ -133,7 +142,9 @@ export function copyBank(pkg: AttackPackage): CopyBank {
   seen.clear();
   const interests = [...pkg.interests].filter((i) => isTargetableTag(i.name, i.qlooTagId) && !mentions(i.name, competitor))
     .sort((a, b) => b.affinity - a.affinity).filter((i) => once(i.name));
-  const angles = dedupe(pkg.copyAngles.map(cleanText)).filter((a) => a && !mentions(a, competitor));
+  const filter: FilterContext = { forbidNames: [competitor], grounded: [pkg.brand.name, ...pkg.gap.map((g) => g.label), ...pkg.interests.map((i) => i.name), ...pkg.where.map((w) => w.city ?? "")].filter(Boolean) };
+  // Model-written angles keep only lines that pass the copy rules (no filler, no uncited numbers).
+  const angles = dedupe(pkg.copyAngles.map(cleanText)).filter((a) => a && !mentions(a, competitor) && isClean(a, filter));
   const topCity = [...pkg.where].sort((a, b) => b.score - a.score).find((w) => w.city)?.city;
-  return { brand: cleanText(pkg.brand.name), competitor, gaps, interests, angles, topCity };
+  return { brand: cleanText(pkg.brand.name), competitor, gaps, interests, angles, topCity, filter };
 }

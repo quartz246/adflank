@@ -35,6 +35,8 @@ export const users = {
   },
   byEmail: (email: string) => one<UserRow>(db().prepare("SELECT * FROM users WHERE email = ?").get(email)),
   byId: (id: number) => one<UserRow>(db().prepare("SELECT * FROM users WHERE id = ?").get(id)),
+  /** A guest account becomes a real one: same id, so its projects and session stay. */
+  claim: (id: number, email: string, passHash: string) => void db().prepare("UPDATE users SET email = ?, pass_hash = ? WHERE id = ?").run(email, passHash, id),
 };
 
 export const sessions = {

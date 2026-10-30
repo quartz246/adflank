@@ -1,3 +1,4 @@
+import { isGuestUser } from "@/lib/auth/session";
 import { z } from "zod";
 import { guard, json } from "@/lib/auth/session";
 import { bossChat } from "@/lib/agent/chat";
@@ -13,6 +14,7 @@ const body = z.object({ message: z.string().trim().min(1).max(1000) }).strict();
 export async function GET(req: Request, ctx: Ctx) {
   const g = await guard(req, (await ctx.params).id);
   if ("error" in g) return g.error;
+  if (isGuestUser(g.user)) return json({ error: "Create a free account to open the project and chat with the Agent." }, 401);
   const scope = isDemoUser(g.user) ? await currentSessionHash() : undefined;
   return json({ messages: chat.forProject(g.project!.id, 50, scope) });
 }
@@ -20,6 +22,7 @@ export async function GET(req: Request, ctx: Ctx) {
 export async function POST(req: Request, ctx: Ctx) {
   const g = await guard(req, (await ctx.params).id);
   if ("error" in g) return g.error;
+  if (isGuestUser(g.user)) return json({ error: "Create a free account to open the project and chat with the Agent." }, 401);
   const p = body.safeParse(await req.json().catch(() => null));
   if (!p.success) return json({ error: "Write a message (up to 1000 characters)." }, 400);
   const demo = isDemoUser(g.user);

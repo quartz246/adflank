@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await currentUser();
   if (!user) redirect("/login");
+  // Guests (pasted a website, no account) are sent to signup by each page, which keeps the project id for the claim.
   return (
     <>
       <TopBar href="/projects">

@@ -1,0 +1,265 @@
+/* Phones and small tablets (<= 800px): the website flow, home, auth and account pages.
+   Loaded from the root layout after designs.css. Every rule starts with html[data-design] (or html) so it outranks
+   wizard.css, designs.css and globals.css whatever order Next puts the chunks in. Desktop (> 800px) is untouched
+   except for the light-safe skeleton shimmer and the step-6 sticky bar, which is hidden there. */
+
+/* Skeleton shimmer: wizard.css hard-codes a dark highlight (#262b2f) that smears on the light designs. */
+html[data-design] .wz .b { background: linear-gradient(90deg, var(--w-card2) 25%, color-mix(in srgb, var(--w-text) 9%, var(--w-card2)) 50%, var(--w-card2) 75%); background-size: 200% 100%; }
+html[data-design] .wz-cta.m-only { display: none; }
+html[data-design] .home-main h1, html[data-design] .home-sub { text-wrap: balance; }
+/* designs.css recolours every meter in the Qloo design, so "them" and "you" looked identical in the gap table. */
+html[data-design] .wz .meter.them i { background: var(--w-them); }
+
+/* Signup and login in the Qloo design: the home page's palette and type. They still used the old indigo app theme, so on a
+   phone they looked like a different product. Scoped to pages that contain .auth; every width. */
+html[data-design="6"] body:has(.auth) {
+  --bg: #f8f6f4; --surface: #ffffff; --surface-3: #f1eeea; --line: #e8e3dd; --line-strong: #d9d2ca;
+  --text: #2f3943; --text-2: #555e68; --muted: #59606a; --faint: #6a6259;
+  --primary: #6464ae; --primary-hover: #55559f; --primary-soft: color-mix(in srgb, #8c8cc8 16%, transparent); --primary-ink: #4b4b94;
+  --brand-grad: #28323c; --font: var(--f-dm), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+html[data-design="6"] body:has(.auth) .topbar { background: color-mix(in srgb, #f8f6f4 90%, transparent); border-bottom-color: #e8e3dd; }
+html[data-design="6"] body:has(.auth) .brand .mark { box-shadow: none; }
+html[data-design="6"] body:has(.auth) .brand b { background: none; color: inherit; -webkit-text-fill-color: currentColor; }
+html[data-design="6"] body:has(.auth) .btn { border-radius: 999px; }
+html[data-design="6"] body:has(.auth) .btn.glow { box-shadow: 0 8px 22px rgba(92, 92, 168, .25); }
+html[data-design="6"] body:has(.auth) input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, #8c8cc8 25%, transparent); }
+html[data-design="6"] .auth-side { background: radial-gradient(70% 60% at 85% 10%, rgba(140, 140, 200, .35), transparent 65%), radial-gradient(60% 60% at 10% 100%, rgba(120, 80, 100, .30), transparent 60%), #28323c; }
+
+@media (max-width: 800px) {
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  html[data-design] body { overflow-x: clip; }
+  html[data-design] .wz { overflow-x: clip; font-size: 15px; }
+
+  /* ---- top bar: sticky, safe-area aware, 44px targets ---- */
+  html[data-design] .wz .wz-top {
+    position: sticky; top: 0; z-index: 30; height: auto; min-height: calc(56px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+    background: var(--w-bg); gap: 10px;
+  }
+  html[data-design] .wz-logo { min-height: 44px; flex: none; }
+  html[data-design] .wz-top-r { min-width: 0; gap: 6px; }
+  html[data-design] .wz-top-r .wz-chip { min-height: 32px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  html[data-design] .home-link, html[data-design] .wz-top .wz-btn.sm, html[data-design] .wz-top .btnlink, html[data-design] .wz-top button {
+    min-height: 44px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  }
+  html[data-design] .home-link { padding: 0 12px; font-size: 15px; }
+  html[data-design] .wz-top .wz-btn.sm { padding: 0 16px; font-size: 14px; }
+
+  /* ---- the six-step flow ---- */
+  html[data-design] .wz-body { display: flex; flex-direction: column; }
+  html[data-design] .wz-body.wide { display: flex; }
+  /* The side panel dissolves so its parts can sit where a phone needs them. */
+  html[data-design] .wz-side, html[data-design] .wz-body.wide .wz-side { display: contents; }
+  html[data-design] .wz-brand, html[data-design] .wz-body.wide .wz-brand {
+    order: 1; margin: 12px max(16px, env(safe-area-inset-left)) 0; padding: 10px 12px; border: 1px solid var(--w-line); background: var(--w-card);
+  }
+  html[data-design] .wz-body.wide .wz-side .wz-brand .min0 { display: flex; }
+
+  /* Step progress: one row of four 44px dots, sticky under the top bar. The step's title is the h1 below. */
+  html[data-design] .wz-steps {
+    order: 2; position: sticky; top: calc(56px + env(safe-area-inset-top)); z-index: 20;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; padding: 6px max(10px, env(safe-area-inset-left));
+    background: color-mix(in srgb, var(--w-bg) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--w-line);
+  }
+  html[data-design] .wz-step:not(:last-child)::after, html[data-design] .wz-body.wide .wz-step:not(:last-child)::after {
+    left: calc(50% + 18px); right: calc(-50% + 18px); top: 21px; bottom: auto; width: auto; height: 2px; margin: 0;
+  }
+  html[data-design] .wz-step button, html[data-design] .wz-body.wide .wz-step button { justify-content: center; align-items: center; min-height: 44px; padding: 0; gap: 0; }
+  html[data-design] .wz-step button > .min0 { display: none; }
+  html[data-design] .wz-ic { width: 32px; height: 32px; font-size: 13px; }
+  html[data-design] .wz-step.sel .wz-ic { box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-blue) 35%, transparent); }
+  html[data-design] .wz-step.sel.done .wz-ic, html[data-design] .wz-step.sel.skipped .wz-ic { box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-green) 35%, transparent); }
+
+  /* Competitor switch: a swipeable chip row, only on the per-competitor steps (3-5). */
+  html[data-design] .wz-seg {
+    order: 3; display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px max(16px, env(safe-area-inset-left)) 0; border: 0;
+    overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: 16px;
+  }
+  html[data-design] .wz-seg::-webkit-scrollbar { display: none; }
+  html[data-design] .wz-body:not([data-step="3"]):not([data-step="4"]):not([data-step="5"]) .wz-seg { display: none; }
+  html[data-design] .wz-seg .wz-eyebrow { margin: 0; flex: none; }
+  html[data-design] .wz-segrow {
+    flex: none; min-height: 44px; padding: 0 14px 0 8px; border-radius: 999px; border: 1px solid var(--w-line2); background: var(--w-card);
+    font-size: 14px; scroll-snap-align: start; max-width: 70vw;
+  }
+  html[data-design] .wz-segrow .wz-fav.sm { width: 26px; height: 26px; border-radius: 50%; font-size: 12px; }
+
+  /* Live stream: right under the steps while the run works (last three lines, wrapped), at the bottom once done. */
+  html[data-design] .wz-term, html[data-design] .wz-body.wide .wz-term {
+    order: 5; display: block; margin: 0 max(16px, env(safe-area-inset-left)) 24px; padding: 12px 14px; border: 1px solid var(--w-line);
+    border-radius: var(--w-r); background: var(--w-card); font-size: 12.5px;
+  }
+  html[data-design] .wz-body[data-run="running"] .wz-term { order: 3; margin-top: 12px; margin-bottom: 0; }
+  html[data-design] .wz-body[data-run="running"] .wz-term .ln:not(:nth-last-child(-n+3)) { display: none; }
+  html[data-design] .wz-term .ln .ell { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+  html[data-design] .wz-term .hd { font-size: 13px; }
+
+  html[data-design] .wz-main, html[data-design] .wz-body.wide .wz-main {
+    order: 4; overflow: visible; padding: 16px max(16px, env(safe-area-inset-right)) 28px max(16px, env(safe-area-inset-left));
+  }
+  html[data-design] .wz-body[data-cta="1"] .wz-main { padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
+  html[data-design] .wz-main > * { max-width: none; }
+
+  /* Step heading: title + status on one line, "Step n of 6 · role" under it. */
+  html[data-design] .wz-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 4px 10px; }
+  html[data-design] .wz-head h1 { font-size: clamp(22px, 6.6vw, 28px); line-height: 1.15; overflow-wrap: anywhere; }
+  html[data-design] .wz-head .sub { grid-column: 1 / -1; grid-row: 2; font-size: 13.5px; }
+  html[data-design] .wz-head .wz-chip { grid-column: 2; grid-row: 1; margin-top: 2px; }
+  html[data-design] .wz-bar { margin: 12px 0 16px; }
+  html[data-design] .cs-sub { font-size: 15px; line-height: 1.45; }
+  html[data-design] .wz-for { font-size: 14px; }
+  html[data-design] .wz-eyebrow, html[data-design] .wz .eyebrow, html[data-design] .wz .th { font-size: 12px; }
+
+  /* Cards and type */
+  html[data-design] .wz-card { padding: 14px; }
+  html[data-design] .wz-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  html[data-design] .wz h2 { font-size: 18px; overflow-wrap: anywhere; }
+  html[data-design] .wz h3 { font-size: 14px; flex-wrap: wrap; }
+  html[data-design] .wz-card.hook h2 { font-size: clamp(19px, 5.4vw, 22px); }
+  html[data-design] .wz .chip { font-size: 13px; padding: 6px 12px; }
+  html[data-design] .wz .li { font-size: 14px; padding: 9px 0; align-items: baseline; }
+  html[data-design] .wz .li .ell { white-space: normal; overflow: visible; }
+  html[data-design] .wz-card.rival { min-height: 64px; }
+  html[data-design] .wz .div-row { grid-template-columns: 54px minmax(0, 1fr) 40px; margin-bottom: 10px; }
+  html[data-design] .wz .div { height: 10px; }
+  /* Qloo cite chips stay small but get a 44px hit area. */
+  html[data-design] .wz-cite { position: relative; display: inline-flex; align-items: center; min-height: 26px; padding: 2px 10px; font-size: 12px; }
+  html[data-design] .wz-cite::after { content: ""; position: absolute; inset: -9px -6px; }
+
+  /* Tables become stacked rows: name on top (wraps, never truncated), the meter full width under it with its value. */
+  html[data-design] .wz .th, html[data-design] .wz .tr {
+    grid-template-columns: 24px minmax(0, 1fr) 46px; grid-template-areas: "n name name" ". bar val"; gap: 8px 10px; padding: 12px 14px;
+  }
+  html[data-design] .wz .tr > :nth-child(1) { grid-area: n; }
+  html[data-design] .wz .tr > :nth-child(2) { grid-area: name; }
+  html[data-design] .wz .tr > :nth-child(3) { grid-area: bar; }
+  html[data-design] .wz .tr > :nth-child(4) { grid-area: val; text-align: right; }
+  html[data-design] .wz .tr > .ell { white-space: normal; overflow: visible; overflow-wrap: anywhere; font-size: 15px; }
+  html[data-design] .wz .tr .meter { height: 8px; }
+  html[data-design] .wz .th { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+  html[data-design] .wz .th > span { display: none; }
+  html[data-design] .wz .th > span:nth-child(2) { display: block; }
+  html[data-design] .wz .tr > .span { grid-area: auto; grid-column: 1 / -1; }
+
+  /* Gap table: taste + gap on top, "them" and "you" bars under it; the header turns into a colour legend. */
+  html[data-design] .wz .tr.g { grid-template-columns: minmax(0, 1fr) 52px; grid-template-areas: "name val" "them them" "you you"; gap: 6px 10px; }
+  html[data-design] .wz .tr.g > :nth-child(1) { grid-area: name; }
+  html[data-design] .wz .tr.g > :nth-child(2) { grid-area: them; }
+  html[data-design] .wz .tr.g > :nth-child(3) { grid-area: you; }
+  html[data-design] .wz .tr.g > :nth-child(4) { grid-area: val; }
+  html[data-design] .wz .th.g { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+  html[data-design] .wz .th.g > span { display: inline-flex; align-items: center; gap: 6px; }
+  html[data-design] .wz .th.g > span:nth-child(1) { margin-right: auto; }
+  html[data-design] .wz .th.g > span:nth-child(2)::before, html[data-design] .wz .th.g > span:nth-child(3)::before { content: ""; width: 14px; height: 6px; border-radius: 3px; background: var(--w-them); }
+  html[data-design] .wz .th.g > span:nth-child(3)::before { background: var(--w-you); }
+  html[data-design] .wz .tr.g .ell { white-space: normal; overflow: visible; overflow-wrap: anywhere; font-size: 15px; }
+
+  /* "What their fans love" table: label on top, bar + score under it. */
+  html[data-design] .wz .tr.g1 { grid-template-columns: minmax(0, 1fr) 46px; grid-template-areas: "name name" "bar val"; }
+  html[data-design] .wz .tr.g1 > :nth-child(1) { grid-area: name; }
+  html[data-design] .wz .tr.g1 > :nth-child(2) { grid-area: bar; }
+  html[data-design] .wz .tr.g1 > :nth-child(3) { grid-area: val; text-align: right; }
+  html[data-design] .wz .th.g1 > span { display: none; }
+  html[data-design] .wz .th.g1 > span:nth-child(1) { display: block; }
+  html[data-design] .wz .tr.g1 .ell { white-space: normal; overflow: visible; font-size: 15px; }
+
+  html[data-design] .wz .skrow { grid-template-columns: 28px minmax(0, 1fr) 64px; }
+  html[data-design] .wz .skrow > :nth-child(4) { display: none; }
+
+  /* Primary CTA: pinned to the bottom edge, above the home indicator. */
+  html[data-design] .wz-cta.slim, html[data-design] .wz-cta.m-only {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; margin: 0; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px;
+    padding: 10px max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    border-radius: 18px 18px 0 0; border: 0; border-top: 1px solid var(--w-line2);
+    background: color-mix(in srgb, var(--w-card) 94%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: 0 -10px 30px rgba(20, 24, 40, .12);
+  }
+  html[data-design] .wz-cta.slim > span { font-size: 12.5px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  html[data-design] .wz-cta.slim .wz-btn { flex: none; min-height: 48px; padding: 0 20px; font-size: 15px; }
+  html[data-design] .wz-alert { font-size: 14px; }
+
+  /* Step 6 ad wall (components/ads, owned by the creative worker): only tap-target sizes here. */
+  html[data-design] .aw-tabs button { min-height: 44px; }
+  html[data-design] .aw-nav button { min-width: 44px; min-height: 44px; }
+  html[data-design] .aw-btn { min-height: 48px; }
+  html[data-design] .aw-dl a { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; }
+
+  /* ---- campaign manager top bar and levers ---- */
+  html[data-design] .wz.cm .wz-top { flex-wrap: wrap; row-gap: 0; padding-bottom: 8px; }
+  html[data-design] .cm-crumbs { flex: 1 1 100%; min-width: 0; min-height: 52px; gap: 10px; }
+  html[data-design] .cm-crumbs .crumb { min-height: 44px; display: inline-flex; align-items: center; white-space: nowrap; font-size: 14px; }
+  html[data-design] .cm-crumbs b { max-width: none; flex: 1 1 auto; min-width: 0; }
+  html[data-design] .cm-crumbs .wz-chip { flex: none; }
+  /* The actions (Save / Export / Launch) leave the header for a bar pinned to the bottom edge. */
+  html[data-design] .wz.cm .wz-top-r {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px;
+    padding: 10px max(14px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    border-top: 1px solid var(--w-line2); border-radius: 18px 18px 0 0;
+    background: color-mix(in srgb, var(--w-card) 94%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: 0 -10px 30px rgba(20, 24, 40, .12);
+  }
+  html[data-design] .wz.cm .wz-top-r .wz-btn { white-space: nowrap; min-height: 48px; padding: 0 10px; font-size: 14.5px; }
+  html[data-design] .wz.cm .wz-top { padding-bottom: 0; }
+  html[data-design] .cm-body { display: flex; flex-direction: column; gap: 14px; padding: 14px max(14px, env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
+  /* Ad sets first, the Qloo levers under them. */
+  html[data-design] .cm-main { order: 1; }
+  html[data-design] .cm-levers { order: 2; }
+  html[data-design] .cm-chip { min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; font-size: 14px; }
+  html[data-design] .cm-seg button { min-height: 44px; display: grid; place-items: center; font-size: 13px; }
+  html[data-design] .cm-lever input[type=range], html[data-design] .ca-blast input[type=range] { height: 44px; }
+  html[data-design] .cm-set { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; }
+  html[data-design] .cm-switch { width: 50px; height: 30px; }
+  html[data-design] .cm-switch i { width: 24px; height: 24px; }
+  html[data-design] .cm-switch::after { content: ""; position: absolute; inset: -8px -4px; }
+  html[data-design] .wz.cm .wz-logo { min-width: 44px; justify-content: center; }
+  html[data-design] .wz-card.site a.mono { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; }
+  html[data-design] .cm-switch.on i { left: 23px; }
+  /* KPI tiles: a compact 3-up grid so the ad sets start on the first screen. */
+  html[data-design] .cm-sum { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  html[data-design] .cm-sum div { padding: 10px 12px; border-radius: 14px; }
+  html[data-design] .cm-sum b { font-size: 19px; }
+  html[data-design] .cm-sum span { font-size: 12px; line-height: 1.3; }
+
+  /* ---- home ---- */
+  html[data-design] .wz.home .wz-top { position: sticky; top: 0; }
+  html[data-design] .home-main {
+    width: calc(100% - 24px); margin: 12px auto 0; padding: 36px max(18px, env(safe-area-inset-left)) 32px; border-radius: 24px;
+  }
+  html[data-design] .home-main h1 { font-size: clamp(28px, 8.2vw, 40px); line-height: 1.08; margin-bottom: 14px; }
+  html[data-design] .home-roles .lab { flex-basis: 100%; margin: 0 0 2px; font-size: 13px; }
+  html[data-design] .home-sub { font-size: 16px; line-height: 1.5; margin-bottom: 22px; }
+  html[data-design] .home-steps li { font-size: 13.5px; padding: 6px 14px 6px 6px; min-height: 36px; box-sizing: border-box; }
+  html[data-design] .home-steps .ic { width: 24px; height: 24px; font-size: 12px; }
+  html[data-design] .home-line { font-size: 12.5px; text-align: left; }
+  html[data-design] .home-roles .role { font-size: 13px; }
+  html[data-design] .home-foot { padding: 20px max(20px, env(safe-area-inset-left)) calc(20px + env(safe-area-inset-bottom)); font-size: 13px; }
+  html[data-design] .acct-main { padding-top: 32px; }
+  html[data-design] .acct-row { min-height: 60px; }
+
+  /* ---- auth pages and the light app shell ---- */
+  html[data-design] .topbar { padding-top: env(safe-area-inset-top); }
+  html[data-design] .topbar .navlink, html[data-design] .topbar .btn, html[data-design] .topbar .brand { min-height: 44px; display: inline-flex; align-items: center; box-sizing: border-box; }
+  html[data-design] .topbar .btn.small { padding: 0 16px; font-size: 14px; }
+  html[data-design] .auth { min-height: calc(100vh - 60px); }
+  html[data-design] .auth-main { padding: 28px max(18px, env(safe-area-inset-left)) calc(28px + env(safe-area-inset-bottom)); place-items: start center; }
+  html[data-design] .auth-card .btn { min-height: 48px; width: 100%; font-size: 16px; }
+}
+
+/* Inputs: 16px+ so iOS Safari never zooms the page when a field gets focus; 48px tall. */
+@media (max-width: 800px) {
+  html[data-design] input:not([type=checkbox]):not([type=radio]):not([type=range]), html[data-design] select, html[data-design] textarea { font-size: 16px; }
+  html[data-design] input:not([type=checkbox]):not([type=radio]):not([type=range]), html[data-design] select { height: 48px; }
+  html[data-design] .siteform { flex-wrap: wrap; padding: 6px; }
+  html[data-design] .siteform .pre { font-size: 14px; padding-left: 10px; }
+  html[data-design] .siteform input { flex: 1 1 140px; height: 50px; font-size: 17px; padding: 0 4px; }
+  html[data-design] .siteform .btn { flex: 1 1 100%; width: 100%; min-width: 0; min-height: 52px; white-space: normal; text-align: center; line-height: 1.25; padding: 12px 16px; font-size: 16px; }
+}
+
+@media (max-width: 374px) {
+  /* Narrow phones: the logo keeps its mark, the word goes, so the run clock and status fit. */
+  html[data-design] .wz:not(.home) .wz-logo { font-size: 0; gap: 0; min-width: 44px; justify-content: center; }
+  html[data-design] .wz:not(.home) .wz-logo .wz-mark { font-size: 15px; width: 32px; height: 32px; }
+  html[data-design] .home-main h1 { font-size: clamp(27px, 8vw, 32px); }
+}

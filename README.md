@@ -1,72 +1,44 @@
 # AdFlank
 
-**Win over your competitors' customers, every day, with live taste data instead of guesses.**
+**An ad agency that works non-stop to win your competitors' customers, powered by Qloo's taste graph.**
 
 Live demo: https://recordings-complete-workers-findarticles.trycloudflare.com
 
-AdFlank is an agent team for *conquesting*, which means winning customers away from a competitor. You add your brand and the
-competitors you want to take customers from, once. After that a Boss, a Planner and one Worker per competitor re-check the
-competition every day on [Qloo](https://www.qloo.com/)'s taste graph. They find what people who like each competitor love that your
-audience doesn't, and turn that gap into ready-to-upload ad campaigns for Meta, TikTok and Google. Nothing is published to an ad
-platform: you review the templates in the app and download them.
+Paste your website. AdFlank's agents read it, find your competitors on [Qloo](https://www.qloo.com/)'s taste graph, profile the
+people who love those competitors (where they are, who they are, what they love, what they listen to and watch), and design a
+campaign for every segment of those fans on Meta, TikTok and Google. Then it keeps watching: a daily run re-reads the fans on Qloo, and
+new cities, ages and tastes become new campaigns. Nothing is published or spent: you review, tune and approve.
 
 Built for the Qloo Agentic Hackathon (2026).
 
 ## What it does
 
-### The daily loop
-Every number in AdFlank cites the Qloo call it came from (`q_<run>_<n>`). The live board shows each call as it runs, and you can open the
-stored call behind any number.
+### Paste a website, watch four steps (about 1-2 minutes, no signup)
+Every number cites the Qloo call it came from (`q_<run>_<n>`), and you can open the stored call behind it.
 
-1. **Watch**: `qloo_trends` on your brand and each competitor (who is rising, who is falling), and `qloo_where_popular` for the cities and
-   regions where each competitor's audience is strongest.
-2. **Profile** people like each competitor's customers: `qloo_audience_demographics` (age and gender skew), `qloo_entity_tags` (the tags
-   that define their taste) and `qloo_recommend`, run once each for the podcasts, TV shows and brands they also like.
-3. **Find the gap**: `qloo_compare_audiences`, your audience against theirs, shows what their fans love that yours don't. That is the
-   switching hook.
-4. **Build the attack package**: where (geo), who (age and gender), interests to target, podcasts and TV shows to sponsor, brands to
-   partner with, and ad-copy angles. The project's own brand and competitors are never listed as partners or recommendations. A copy
-   angle is kept only if it names a gap or an interest from the package; the rest are dropped and the drop is logged.
-5. **Measure**: from the second run on, each package is compared with the previous run of the same project and says whether you are gaining
-   on that competitor (trend momentum, brand minus competitor, and the size of the taste gap).
+1. **Read your website**: the agent reads the homepage and names the brand (and looks it up with `qloo_describe`).
+2. **Find your competitors**: Qloo's recommendations for the brand's fans (`qloo_recommend`, brands); the Planner keeps the direct
+   competitors. A small brand that isn't in Qloo is profiled through the big brands its buyers also shop with.
+3. **Profile their fans**, one screen per competitor:
+   - a **fan map** of Qloo's heat zones (`qloo_where_popular`, 20 cells, each labelled with its nearest metro), with the metros ranked;
+   - **who they are**: age and gender skew against the average adult (`qloo_audience_demographics`);
+   - **what they love**: the taste tags that define them (`qloo_entity_tags`), or what they love that your fans don't
+     (`qloo_compare_audiences`) when your brand is in Qloo;
+   - **what they listen to, watch and buy**: podcasts, TV shows, artists and brands (`qloo_recommend` per type), plus their Qloo trend;
+   - a one-line persona built only from those calls. Click a city to see the campaigns aimed there.
+4. **Campaigns for every segment**: each segment is a taste x a city x an age/gender band of one competitor's fans, and gets its own ads
+   (Meta feed, Stories, TikTok, Google search) in the brand's own colours and icon, with copy from the GLM copywriter agent after a
+   banned-phrase and platform-limit filter. The screen is a map of the campaigns' cities with the ad floating over it: click a pin to
+   open its ad, click a campaign to fly the map to it. Every targeting choice shows the Qloo fact it came from.
+   - **Daily budget** sets how many campaigns run (from 2 at $10/day up to 12 at $1,000/day, drawn from the pool of segments in Qloo's
+     data) and the estimated weekly reach of each.
+   - **Qloo levers**: taste match (adds related tastes above an affinity threshold), places per ad set (the strongest metros first), age
+     focus (over-indexed bands are marked), platforms, and **Replace segment** (swaps a campaign for the next segment in the data).
+   - **Launch campaign** is a labelled preview: publishing to ad platforms comes after the hackathon.
 
-Each brand and competitor is checked with `qloo_describe` when you add it. If a name isn't found or is ambiguous, the app says so and lets
-you pick the right Qloo entity. International markets work: Qloo filters by country and city.
-
-### A real run
-Live run of the hosted demo project on 2026-10-29, on the code in this repository: brand **Allbirds** against **Nike** and **Adidas**,
-US market, live Qloo hackathon API:
-
-| | |
-|---|---|
-| Qloo calls | **17 of 17 ok**: all 17 chosen by the model through the tool gate, none filled in by code (8 for Nike, 9 for Adidas) |
-| Qloo tools used | `qloo_trends`, `qloo_where_popular`, `qloo_audience_demographics`, `qloo_entity_tags`, `qloo_recommend` (podcasts, TV shows and brands for both competitors, plus artists for Adidas), `qloo_compare_audiences`. The `qloo_describe` entity checks ran when the demo project was set up, not in this run |
-| Run time | **278 s** (4 min 38 s) for the whole loop, both competitors |
-| Output | **2 attack packages**, citing **8** and **9 Qloo calls** (17 citations in total), then **6 ad templates**: Meta, TikTok and Google per package |
-| Tool gate | **1 call dropped**: an extra `qloo_compare_audiences` that went over the per-turn limit, logged and shown on the board. For Nike the model's copy angles failed the grounding check, so AdFlank used its deterministic angles built from the gap tags and labelled them as a fallback |
-| Model that ran | `glm-4.5-flash` for the Planner and both Workers, `glm-4.7-flash` for the copy. The configured `glm-5.3-flash` returned Z.ai error 1113 (insufficient balance) and `glm-4.7-flash` was rate-limited (429) during research, so the fallback chain ran |
-| vs last run | shown for both competitors, against the project's previous completed run that day: momentum 0 pts before and now (all three brands flat in Qloo's trend window), taste gap unchanged, recommendations 12 new for each competitor, 4 gone for Nike and 8 for Adidas. Verdict: "Allbirds is not gaining yet" |
-
-All six ad templates built from these packages pass their platform checks with 0 errors. The warnings are platform ids and the video to
-add at upload time, and Qloo locations with no nearby metro, which are left out of targeting.
-
-### Ad templates
-Each attack package becomes one ready-to-publish template per platform, in that platform's format and limits, with a mockup preview
-and a download. Everything is created **paused**.
-- **Meta Ads**: campaign / ad set / ad with primary text, headline, description, CTA, placements and an audience (locations, age, gender,
-  detailed-targeting interests). Download as JSON or as a CSV in the Ads Manager bulk-import shape.
-- **TikTok Ads**: ad text within TikTok's length limit, interest and behavior targeting, locations, age groups, and a creative brief for the
-  video (hook, scenes, on-screen text, sound, creators to sponsor). Download as JSON (TikTok has no public bulk-CSV format).
-- **Google Ads**: a Search campaign with a Responsive Search Ad (up to 15 headlines of 30 characters and 4 descriptions of 90), keywords
-  including competitor-name keywords, a custom audience segment and locations. Download as JSON or as a Google Ads Editor CSV.
-
-Limits are checked per field (CJK characters count double where the platform says so). Errors block the CSV export; warnings are shown
-next to the field. Competitor names go into search keywords only, never into ad text. Audiences are always named "people like
-<competitor>'s customers".
-
-**Connect and Publish are a clearly labelled preview.** The "Connect Meta / TikTok / Google Ads" screens show the OAuth consent the real
-integration will ask for (the scopes, and the authorize endpoint as text), with the Allow button disabled. "Publish" shows the exact
-payload that would be sent and makes no network call. Real publishing through the platforms' APIs comes after the hackathon.
+Logged-in projects also keep the original agent workspace: a Boss chat, a live board of the Planner's tasks and each Worker's Qloo calls,
+a daily scheduled run that is compared with the previous one ("vs last run"), and per-platform ad templates (Meta, TikTok, Google
+Responsive Search Ads) with mockups and CSV/JSON downloads.
 
 ### Why a ChatGPT chat can't replace it
 - **Live Qloo numbers.** Audience affinity, age and gender skew, geography, taste tags and trends come from Qloo's taste graph at run time,
@@ -166,7 +138,7 @@ docker run -d --name adflank -p 127.0.0.1:3000:3000 \
   -e QLOO_API_KEY -e GLM_API_KEY \
   adflank
 ```
-Open http://127.0.0.1:3000, sign up, and add a brand and two competitors. `GET /api/health` shows the configured model, the model that last
+Open http://127.0.0.1:3000 and paste a website (or sign up and add a brand and competitors yourself). `GET /api/health` shows the configured model, the model that last
 ran, and whether Qloo is live or mocked.
 
 ### Local development
@@ -198,10 +170,9 @@ npm run e2e -- --brand Allbirds --competitors Nike,Adidas --country US --out <di
 | `PORT` | no | `3000` | |
 
 ## Try the hosted demo
-Open the live demo (link at the top) and press **Try the live demo (no signup)**. This opens a shared, read-only demo project (Allbirds vs Nike and Adidas)
-with two seeded runs: the board, the attack packages with their citations, the **vs last run** strip that shows what changed between
-the two runs, and **Ad templates**. Or **Sign up free** with any email and a password of 8 or more characters (no email verification),
-add your own brand and competitors, and press **Run now**.
+Open the live demo (link at the top), paste any brand's website (for example **glossier.com** or **allbirds.com**) and press
+**Find my competitors' customers**. No signup: a guest account holds the project, and you can claim it with an email and password later.
+The four steps run live; the campaign screen appears when the copy and images are ready.
 
 ## Data and privacy
 No Qloo response data is stored in this repository. The test fixtures are synthetic. Qloo results live only in the app's own database. The
@@ -214,5 +185,6 @@ Docker · Vitest
 ## License
 MIT, see [LICENSE](LICENSE).
 
-Third-party notices: `src/lib/qloo/tool-schemas.json` comes from `@qloo/qloo-harness` 0.1.26 (MIT, Copyright (c) 2026 Qloo);
-see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Third-party notices: `src/lib/qloo/tool-schemas.json` comes from `@qloo/qloo-harness` 0.1.26 (MIT, Copyright (c) 2026 Qloo), and the
+map outlines in `src/lib/geo/outlines.ts` are baked from `us-atlas` and `world-atlas` (ISC; US Census and Natural Earth data, public
+domain); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -92,8 +92,11 @@ export function gateToolCall(name: unknown, rawArgs: unknown, audit?: AuditSink)
     const issue = res.error.issues[0];
     return drop(`invalid arguments: ${issue ? `${issue.path.join(".") || "(root)"} ${issue.message}` : "schema mismatch"}`.slice(0, 200));
   }
-  audit?.({ tool: toolName, args: clip(JSON.stringify(res.data), 400), decision: "accepted", reason: "" });
-  return { ok: true, name: toolName, args: res.data as Record<string, unknown> };
+  const args = res.data as Record<string, unknown>;
+  // The fan map wants every heat cell Qloo will give (20), whatever limit the model asked for.
+  if (toolName === "qloo_where_popular") args.limit = 20;
+  audit?.({ tool: toolName, args: clip(JSON.stringify(args), 400), decision: "accepted", reason: "" });
+  return { ok: true, name: toolName, args };
 }
 
 // ---------------------------------------------------------------------------------------------

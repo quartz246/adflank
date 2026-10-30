@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { AttackPackage, PlatformTemplate } from "@/lib/types/attack";
 import { META } from "./limits";
 import { Issues } from "./validate";
-import { cleanText, copyBank, firstFit, fitClause, hardCut, isAdjective, peopleLike, titleCase } from "./copy";
+import { cleanText, copyBank, firstFit, fitClause, hardCut, isAdjective, peopleLike, titleCase, possessive } from "./copy";
 import {
   PLACEHOLDER_URL, skippedPlacesIssues, ageSpan, checkTrademark, contextFrom, finish, genderSkew, plannedPlaces,
   zCountry, zName, zPlace, zText, zUrl, type BuildContext,
@@ -72,14 +72,14 @@ export function planMeta(pkg: AttackPackage, opts: { landingUrl?: string } = {})
   const cites: string[] = [pkg.who.cite];
 
   const g0 = b.gaps[0]?.label, i0 = b.interests[0]?.name;
-  const lead = b.angles[0] ?? (g0 ? `Made for people who love ${g0}.` : `Meet ${b.brand}.`);
+  const lead = b.angles[0] ?? (g0 ? `For people who love ${g0}.` : `Meet ${b.brand}.`);
   const tail = ` Try ${b.brand} today.`;
   let primaryText = firstFit([lead + tail], META.primaryText.max, false) ?? fitClause(lead, META.primaryText.max, false) ?? hardCut(lead, META.primaryText.max, false);
   if (primaryText.length < META.primaryText.min && b.angles[1]) {
     primaryText = firstFit([`${lead} ${b.angles[1]}${tail}`, `${lead} ${b.angles[1]}`], META.primaryText.max, false) ?? primaryText;
   }
   const headline = firstFit([g0 && `${b.brand}: ${titleCase(g0)}`, g0 && (isAdjective(g0) ? `${titleCase(g0)} by Design` : `Love ${titleCase(g0)}?`), b.brand], META.headline.max, false) ?? hardCut(b.brand, META.headline.max, false);
-  const description = firstFit([i0 && `Made for ${i0} fans`, `New from ${b.brand}`, "Try it today"], META.description.max, false) ?? "";
+  const description = firstFit([i0 && `For ${i0} fans`, `New from ${b.brand}`, `Shop ${b.brand}`], META.description.max, false) ?? "";
 
   const interests = b.interests.slice(0, 6).map((i) => ({ name: cleanText(i.name), fallbackCategory: closestMetaCategory(i.name) }));
   for (const i of b.interests.slice(0, 6)) cites.push(i.cite);
@@ -96,7 +96,7 @@ export function planMeta(pkg: AttackPackage, opts: { landingUrl?: string } = {})
     campaignName: `AdFlank | ${b.brand} vs ${b.competitor}`.slice(0, 255),
     objective: "OUTCOME_TRAFFIC",
     specialAdCategories: [],
-    adSetName: `People like ${b.competitor}'s customers`.slice(0, 255),
+    adSetName: `People like ${possessive(b.competitor)} customers`.slice(0, 255),
     adName: `${b.brand} | ${g0 ?? "switch"}`.slice(0, 255),
     dailyBudgetCents: 2000,
     countries: places.countries,

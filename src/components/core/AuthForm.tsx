@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { api } from "./api";
 
-export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
+export default function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,13 +14,13 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const r = await api(`/api/auth/${mode}`, { body: { email, password } });
     setBusy(false);
     if (!r.ok) return setError(r.data.error ?? "Something went wrong.");
-    window.location.href = "/projects";
+    window.location.href = next ?? "/projects";
   }
   return (
     <form onSubmit={submit} className="card stack" style={{ padding: 28 }}>
       <div>
-        <h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-        <p className="muted small">{mode === "login" ? "Log in to see your projects and the latest runs." : "Free, instant, no email verification. Add your first brand in a minute."}</p>
+        <h1>{mode === "login" ? "Welcome back" : next ? "Save your project" : "Create your account"}</h1>
+        <p className="muted small">{mode === "login" ? "Log in to see your projects and the latest runs." : next ? "Free, instant. Your research stays, and the team runs it again every day." : "Free, instant, no email verification. Add your first brand in a minute."}</p>
       </div>
       <label>Email<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" /></label>
       <label>Password{mode === "signup" && <span className="hint"> at least 8 characters</span>}<input type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={mode === "signup" ? 8 : 1} value={password} onChange={(e) => setPassword(e.target.value)} /></label>

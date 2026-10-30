@@ -19,7 +19,8 @@ export const DEMO_SEED = {
 /** Hard cap on seed runs per demo project, failed ones included, so a failing Qloo or LLM cannot loop. */
 export const MAX_SEED_RUNS = 4;
 
-export const demoEnabled = () => process.env.DEMO !== "0";
+/** The shared demo account is off unless DEMO=1 is set explicitly. */
+export const demoEnabled = () => process.env.DEMO === "1";
 export const isDemoUser = (u: UserRow | undefined) => Boolean(u && u.email === DEMO_EMAIL);
 
 export function demoUser(): UserRow {

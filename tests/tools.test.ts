@@ -41,6 +41,13 @@ describe("tool gate", () => {
     expect(gateToolCall("qloo_describe", { entity: "AC/DC", type: "artist" }).ok).toBe(true);
   });
 
+  it("always asks where_popular for Qloo's full 20 heat cells", () => {
+    for (const args of [{ entity: "X", within: "US" }, { entity: "X", within: "US", limit: 5 }]) {
+      const g = gateToolCall("qloo_where_popular", args);
+      expect(g.ok && g.args.limit).toBe(20);
+    }
+  });
+
   it("slims results to data and strips URLs and provenance", () => {
     const env = {
       status: "ok" as const,

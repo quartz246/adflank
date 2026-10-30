@@ -11,6 +11,7 @@ import { gateToolCall, runGatedTool, toolDefs, type AllowedTool, type SlimResult
 import { plannerMessages, workerMessages, type WorkerCtx } from "./prompts";
 import { composePackage, writeCopyAngles, compareWithLastRun } from "./compose";
 import { resolveEntity } from "./resolve";
+import { PHASES, SITE_TRIGGER, findCompetitors, readWebsite, step, type Phase } from "./wizard";
 import { clip, sanitizeText } from "@/lib/util/sanitize";
 
 export const MAX_WORKER_TURNS = 4;
@@ -163,7 +164,7 @@ export function requiredCalls(ctx: WorkerCtx): Need[] {
   const type = ctx.entityType;
   const needs: Need[] = [
     { key: "trends", tool: "qloo_trends", match: (c) => c.tool === "qloo_trends", args: { entities: ctx.brandId ? [ctx.brandId, ctx.competitorId] : [ctx.competitorId], entity_type: type, start_date: ctx.trendStart, end_date: ctx.trendEnd, limit: 20 } },
-    { key: "where", tool: "qloo_where_popular", match: (c) => c.tool === "qloo_where_popular", args: { entity: ctx.competitorId, entity_type: type, within: ctx.within, limit: 10 } },
+    { key: "where", tool: "qloo_where_popular", match: (c) => c.tool === "qloo_where_popular", args: { entity: ctx.competitorId, entity_type: type, within: ctx.within, limit: 20 } },
     { key: "who", tool: "qloo_audience_demographics", match: (c) => c.tool === "qloo_audience_demographics", args: { entity: ctx.competitorId, entity_type: type } },
     { key: "tags", tool: "qloo_entity_tags", match: (c) => c.tool === "qloo_entity_tags", args: { entities: [ctx.competitorId], entity_type: type, limit: 12 } },
     ...RECOMMEND_TARGETS.map(({ key, targetType }): Need => ({
@@ -189,16 +190,18 @@ function canonicalise(args: Record<string, unknown>, names: Map<string, string>)
   return out;
 }
 
-async function work(st: RunState, ctx: WorkerCtx, names: Map<string, string>): Promise<void> {
-  const t = tasks.add(st.runId, "worker", `Research ${ctx.competitor}`, ctx.competitor, "running", ctx.focus);
+/** One Worker for one competitor. With a phase (website flow), it is offered only that step's tools and calls. */
+async function work(st: RunState, ctx: WorkerCtx, names: Map<string, string>, phase?: Phase): Promise<void> {
+  const needed = () => requiredCalls(ctx).filter((n) => !phase || (phase.keys as readonly string[]).includes(n.key));
+  const t = tasks.add(st.runId, "worker", phase ? `${phase.label}: ${ctx.competitor}` : `Research ${ctx.competitor}`, ctx.competitor, "running", ctx.focus);
   emit(st.project.id, { type: "task", task: t });
   const made: Array<{ tool: string; args: Record<string, unknown>; ok: boolean }> = [];
   const sink = st.auditSink("worker");
-  const messages: ChatMessage[] = workerMessages(ctx);
+  const messages: ChatMessage[] = workerMessages(ctx, phase?.promptSteps);
   let llmCalls = 0;
   let llmOk = false;
   for (let turn = 0; turn < MAX_WORKER_TURNS; turn++) {
-    const res = await st.ask({ purpose: "worker", messages, tools: toolDefs(), maxTokens: 4096 });
+    const res = await st.ask({ purpose: "worker", messages, tools: toolDefs(phase ? [...phase.tools] : undefined), maxTokens: 4096 });
     if (res.empty) break;
     llmOk = true;
     if (res.toolCalls.length === 0) break;
@@ -212,7 +215,10 @@ async function work(st: RunState, ctx: WorkerCtx, names: Map<string, string>): P
         reply = JSON.stringify({ error: "dropped: call budget reached" });
       } else {
         const g = gateToolCall(tc.function.name, tc.function.arguments, sink);
-        if (!g.ok) {
+        if (g.ok && phase && !phase.tools.includes(g.name)) {
+          sink({ tool: g.name, args: clip(tc.function.arguments, 400), decision: "dropped", reason: "not offered in this step" });
+          reply = JSON.stringify({ error: "dropped by AdFlank: that function is not offered in this step." });
+        } else if (!g.ok) {
           reply = JSON.stringify({ error: `dropped by AdFlank: ${g.reason}. Only the offered functions can be used.` });
         } else {
           llmCalls++;
@@ -228,11 +234,11 @@ async function work(st: RunState, ctx: WorkerCtx, names: Map<string, string>): P
     for (const tc of res.toolCalls.slice(MAX_CALLS_PER_TURN)) {
       sink({ tool: clip(tc.function.name, 80), args: clip(tc.function.arguments, 400), decision: "dropped", reason: "too many calls in one turn" });
     }
-    if (made.length > 0 && requiredCalls(ctx).every((n) => made.some((m) => m.ok && n.match(m)))) break;
+    if (made.length > 0 && needed().every((n) => made.some((m) => m.ok && n.match(m)))) break;
   }
   // Code fills any required call the LLM did not make (or that failed), labelled on the board.
   const filled: string[] = [];
-  for (const need of requiredCalls(ctx)) {
+  for (const need of needed()) {
     if (made.some((m) => m.ok && need.match(m))) continue;
     const g = gateToolCall(need.tool, need.args, st.auditSink("code"));
     if (!g.ok) continue;
@@ -286,6 +292,12 @@ export async function executeRun(runId: string, projectId: number, deps: RunDeps
   emit(project.id, { type: "run", run: runs.byId(runId)! });
   try {
     st.log("info", `Run started (Qloo ${qloo.mode}, LLM ${llm.mode === "mock" ? "mock" : llm.configuredModel})`);
+    // Projects started from a website keep the six-step flow on every later run (manual, chat or daily).
+    const wizard = Boolean(project.landing_url) && runs.forProject(project.id, 50).some((r) => r.trigger === SITE_TRIGGER);
+    if (wizard) {
+      const site = await readWebsite(st);
+      await findCompetitors(st, site);
+    }
     let list = entities.forProject(project.id);
     list = await ensureResolved(st, list);
     const brand = list.find((e) => e.role === "brand");
@@ -296,6 +308,10 @@ export async function executeRun(runId: string, projectId: number, deps: RunDeps
     if (!brandFound) st.log("warn", `Brand ${brand?.name ?? "(none)"} is not resolved in Qloo; audience comparison is skipped.`);
     if (ready.length === 0) throw new Error("No competitor is resolved in Qloo yet. Add or fix competitors first.");
 
+    if (wizard) {
+      step(st, 3, "working");
+      st.log("agent", `planning the research on ${ready.map((c) => c.name).join(" and ")}`);
+    }
     const focus = await plan(st, brand, ready);
     const win = trendWindow(deps.now);
     const names = new Map<string, string>();
@@ -315,11 +331,27 @@ export async function executeRun(runId: string, projectId: number, deps: RunDeps
       focus: focus.get(c.id) ?? "",
     }));
     // Workers run one after another: the LLM endpoint is rate limited and the board reads better.
-    for (const ctx of ctxs) await work(st, ctx, names);
+    if (wizard) {
+      // Website flow: step by step across all competitors, so the page moves through steps 3, 4 and 5 in order.
+      for (const phase of PHASES) {
+        if (phase.step === 5 && !brandFound) {
+          // No audience of our own to compare with: the opening is what their fans love most (step 4's taste tags).
+          const tags = calls.forRun(runId).filter((c) => c.ok && c.tool === "qloo_entity_tags" && c.competitor !== null).length;
+          step(st, 5, "done", `their strongest tastes · ${tags} competitor${tags === 1 ? "" : "s"}`);
+          continue;
+        }
+        step(st, phase.step, "working");
+        // Competitors in parallel within a step: the page still moves through the steps in order.
+        await Promise.all(ctxs.map((ctx) => work(st, ctx, names, phase)));
+        const n = calls.forRun(runId).filter((c) => c.ok && c.competitor !== null && phase.tools.includes(c.tool as AllowedTool)).length;
+        step(st, phase.step, "done", `${n} Qloo call${n === 1 ? "" : "s"} · ${ctxs.length} competitor${ctxs.length === 1 ? "" : "s"}`);
+      }
+      step(st, 6, "working");
+    } else for (const ctx of ctxs) await work(st, ctx, names);
 
     const all = calls.forRun(runId);
     let made = 0;
-    for (const ctx of ctxs) {
+    await Promise.all(ctxs.map(async (ctx) => {
       const t = tasks.add(runId, "composer", `Build attack package vs ${ctx.competitor}`, ctx.competitor, "running");
       emit(project.id, { type: "task", task: t });
       const pkg = composePackage({ runId, project, brand: brandFound ?? brand, competitor: ready.find((c) => c.name === ctx.competitor)!, calls: all.filter((c) => c.competitor === ctx.competitor || c.competitor === null), projectEntities: list });
@@ -333,9 +365,10 @@ export async function executeRun(runId: string, projectId: number, deps: RunDeps
       const done = tasks.update(t.id, "done", `${Object.keys(pkg.citations).length} cited Qloo calls; copy: ${copy.source}; ${vs ? (vs.gainingOn ? "gaining vs last run" : "not gaining vs last run") : "first run, nothing to compare yet"}`);
       emit(project.id, { type: "task", task: done });
       emit(project.id, { type: "package", runId, competitor: ctx.competitor });
-    }
+    }));
     const model = st.modelsUsed.at(-1) ?? (llm.mode === "mock" ? "mock-llm" : "none (deterministic fallback)");
     runs.setModel(runId, model, st.fallbackReasons.size ? [...st.fallbackReasons].map((r) => sanitizeText(r)).join("; ") : undefined);
+    if (wizard) step(st, 6, "done", `${made * 3} ad templates · ${made} competitor${made === 1 ? "" : "s"}`);
     runs.finish(runId, "done");
     st.log("info", `Run finished: ${made} attack package(s), ${calls.forRun(runId).length} Qloo calls, model ${model}`);
     emit(project.id, { type: "run", run: runs.byId(runId)! });
@@ -352,10 +385,28 @@ export async function executeRun(runId: string, projectId: number, deps: RunDeps
 }
 
 // ---------------------------------------------------------------------------------------------
-// Run manager: one run at a time in this process; a project never has two runs in flight.
+// Run manager: up to RUN_CONCURRENCY runs at once (default 3), the rest wait in order; a project never has two in flight.
 
-const g = globalThis as unknown as { __adflankQueue?: Promise<unknown>; __adflankActive?: Map<number, string> };
+const g = globalThis as unknown as { __adflankWaiting?: Array<() => void>; __adflankRunning?: { n: number }; __adflankActive?: Map<number, string> };
 const active: Map<number, string> = (g.__adflankActive ??= new Map());
+const waiting: Array<() => void> = (g.__adflankWaiting ??= []);
+const slots = (g.__adflankRunning ??= { n: 0 });
+const maxRuns = () => {
+  const v = Number(process.env.RUN_CONCURRENCY);
+  return Number.isInteger(v) && v > 0 ? v : 3;
+};
+async function acquire(): Promise<void> {
+  if (slots.n < maxRuns()) {
+    slots.n++;
+    return;
+  }
+  await new Promise<void>((resolve) => waiting.push(resolve));
+}
+function release(): void {
+  const next = waiting.shift();
+  if (next) next();
+  else slots.n--;
+}
 
 export function activeRunFor(projectId: number): string | undefined {
   return active.get(projectId);
@@ -369,11 +420,8 @@ export function startRun(projectId: number, trigger: string, deps: RunDeps = {})
   const qloo = deps.qloo ?? getQloo();
   runs.create(runId, projectId, trigger, qloo.mode);
   active.set(projectId, runId);
-  const prev = g.__adflankQueue ?? Promise.resolve();
-  const done = prev
-    .catch(() => undefined)
-    .then(() => executeRun(runId, projectId, { ...deps, qloo }))
+  const done = acquire()
+    .then(() => executeRun(runId, projectId, { ...deps, qloo }).finally(release))
     .finally(() => active.delete(projectId));
-  g.__adflankQueue = done;
   return { runId, done, reused: false };
 }

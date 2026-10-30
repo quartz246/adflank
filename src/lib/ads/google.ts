@@ -1,8 +1,9 @@
+import { isClean } from "./creative/banned";
 import { z } from "zod";
 import type { AttackPackage, PlatformTemplate } from "@/lib/types/attack";
 import { GOOGLE } from "./limits";
 import { Issues, dedupe, mentions } from "./validate";
-import { cleanText, copyBank, fitClause, isAdjective, peopleLike, slug, titleCase } from "./copy";
+import { cleanText, copyBank, fitClause, isAdjective, peopleLike, slug, titleCase, possessive } from "./copy";
 import { PLACEHOLDER_URL, skippedPlacesIssues, checkTrademark, contextFrom, finish, plannedPlaces, zCountry, zName, zText, zUrl, type BuildContext } from "./context";
 import { csvFilename, toCsv } from "./csv";
 
@@ -51,21 +52,21 @@ export function planGoogle(pkg: AttackPackage, opts: { landingUrl?: string } = {
   if (b.topCity) headlineCands.push(fit(`${b.brand} in ${b.topCity}`));
   for (const g of b.gaps.slice(0, 4)) {
     const l = titleCase(g.label);
-    if (isAdjective(g.label)) headlineCands.push(fit(`${l} by Design`), fit(`Made for ${l} Lives`));
-    else headlineCands.push(fit(`Love ${l}?`), fit(`Made for ${l} Fans`));
+    if (isAdjective(g.label)) headlineCands.push(fit(`${l} by Design`), fit(`Quietly ${l}`));
+    else headlineCands.push(fit(`Love ${l}?`), fit(`${l} Without the Hype`));
   }
-  for (const i of b.interests.slice(0, 3)) if (!isAdjective(i.name)) headlineCands.push(fit(`For ${titleCase(i.name)} Lovers`));
+  for (const i of b.interests.slice(0, 3)) if (!isAdjective(i.name)) headlineCands.push(fit(`For ${titleCase(i.name)} People`));
   for (const a of b.angles) headlineCands.push(fit(a));
-  headlineCands.push(fit(`Try ${b.brand} Today`), fit(`Switch to ${b.brand}`), fit("See Why People Switch"));
-  const headlines = dedupe(headlineCands.filter((h): h is string => !!h && !mentions(h, b.competitor))).slice(0, 15);
+  headlineCands.push(fit(`Shop ${b.brand}`), fit(`Switch to ${b.brand}`), fit(`${b.brand} Official Site`));
+  const headlines = dedupe(headlineCands.filter((h): h is string => !!h && !mentions(h, b.competitor) && isClean(h, b.filter))).slice(0, 15);
 
   const descCands: (string | null)[] = b.angles.map((a) => fitClause(a, GOOGLE.description.max));
   const g0 = b.gaps[0]?.label, i0 = b.interests.find((i) => !isAdjective(i.name))?.name;
   const g1 = b.gaps.slice(1).find((g) => g0 && !g.label.toLocaleLowerCase().includes(g0.toLocaleLowerCase()) && !g0.toLocaleLowerCase().includes(g.label.toLocaleLowerCase()))?.label;
-  if (g0) descCands.push(fitClause(`${b.brand} is made for people into ${g0.toLocaleLowerCase()}${g1 ? ` and ${g1.toLocaleLowerCase()}` : ""}. Come see why people switch.`, GOOGLE.description.max));
-  if (i0) descCands.push(fitClause(`Into ${i0}? ${b.brand} was built for you. Try it today.`, GOOGLE.description.max));
-  descCands.push(fitClause(`Discover ${b.brand}. Made for people who know what they like. Try it today.`, GOOGLE.description.max));
-  const descriptions = dedupe(descCands.filter((d): d is string => !!d && !mentions(d, b.competitor))).slice(0, 4);
+  if (g0) descCands.push(fitClause(`${b.brand}, for people into ${g0.toLocaleLowerCase()}${g1 ? ` and ${g1.toLocaleLowerCase()}` : ""}. See the range and order online.`, GOOGLE.description.max));
+  if (i0) descCands.push(fitClause(`Big on ${i0.toLocaleLowerCase()}? See what ${b.brand} makes and find the one for you.`, GOOGLE.description.max));
+  descCands.push(fitClause(`Shop ${b.brand} online. See the full range on the official site.`, GOOGLE.description.max));
+  const descriptions = dedupe(descCands.filter((d): d is string => !!d && !mentions(d, b.competitor) && isClean(d, b.filter))).slice(0, 4);
 
   // Search keywords: the competitor (conquesting) and the brand. Interests and gap hooks go into the
   // custom audience segment below: as bare search keywords ("sports", "hip hop") they would buy
@@ -103,7 +104,7 @@ export function planGoogle(pkg: AttackPackage, opts: { landingUrl?: string } = {
 
   const input: GoogleInput = {
     campaignName: `AdFlank | ${b.brand} vs ${b.competitor} | Search`.slice(0, 255),
-    adGroupName: `People like ${b.competitor}'s customers`.slice(0, 255),
+    adGroupName: `People like ${possessive(b.competitor)} customers`.slice(0, 255),
     dailyBudget: 20,
     headlines,
     descriptions,

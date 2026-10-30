@@ -1,68 +1,57 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { currentUser } from "@/lib/auth/session";
+import { currentUser, isGuestUser } from "@/lib/auth/session";
 import { entities, projects, runs } from "@/lib/db/repo";
-import { COUNTRY_CODES, countryName } from "@/lib/geo/cities";
-import NewProjectForm from "@/components/core/NewProjectForm";
-import DemoButton from "@/components/core/DemoButton";
-import { demoEnabled, isDemoUser } from "@/lib/demo";
+import SiteForm from "@/components/core/SiteForm";
+import LogoutButton from "@/components/core/LogoutButton";
+import "@/components/wizard/wizard.css";
 
 export const dynamic = "force-dynamic";
 
-const runBadge = (s: string) => (s === "done" ? "badge ok" : s === "running" || s === "queued" ? "badge run" : s === "failed" ? "badge bad" : "badge warn");
+const ago = (iso: string) => {
+  const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
+  return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`;
+};
+const STATUS: Record<string, string> = { done: "ready", running: "running", queued: "running", failed: "stopped" };
 
+/** Signed-in home: the same website box as the landing page, and the user's saved searches under it. */
 export default async function ProjectsPage() {
   const user = await currentUser();
   if (!user) redirect("/login");
-  const list = projects.forUser(user.id);
-  const countries = COUNTRY_CODES.map((code) => ({ code, name: countryName(code)! })).sort((a, b) => a.name.localeCompare(b.name));
+  if (isGuestUser(user)) redirect("/signup");
+  const list = projects.forUser(user.id).map((p) => {
+    const last = runs.lastForProject(p.id);
+    const rivals = entities.forProject(p.id).filter((e) => e.role === "competitor" && e.status === "found").map((e) => e.name);
+    return { id: p.id, name: p.name, rivals, status: last?.status, at: last?.started_at ?? p.created_at };
+  });
   return (
-    <div className="stack loose">
-      <div className="page-head">
-        <div>
-          <h1>Projects</h1>
-          <p className="muted" style={{ margin: 0 }}>One project per brand. The agent team runs each one daily against its competitors.</p>
-        </div>
-      </div>
-      <div className="split">
-        <section className="stack">
-          {list.length === 0 && (
-            <div className="empty">
-              <div className="icon" aria-hidden>+</div>
-              <h3>No projects yet</h3>
-              <p className="small" style={{ maxWidth: 420, margin: "0 auto 14px" }}>
-                Add your brand and up to five competitors on the right. AdFlank checks each name in Qloo, then the team runs its first
-                research pass.
-              </p>
-              {demoEnabled() && !isDemoUser(user) && <div className="row" style={{ justifyContent: "center" }}><DemoButton className="btn secondary" label="Or open the demo project" /></div>}
-            </div>
-          )}
-          {list.map((p) => {
-            const ents = entities.forProject(p.id);
-            const brand = ents.find((e) => e.role === "brand");
-            const comps = ents.filter((e) => e.role === "competitor");
-            const last = runs.lastForProject(p.id);
-            return (
-              <Link key={p.id} href={`/projects/${p.id}`} className="card project-card">
-                <div className="row between">
-                  <h3>{p.name}</h3>
-                  {last ? <span className={runBadge(last.status)}>{last.status === "done" ? "last run done" : last.status}</span> : <span className="badge">no runs yet</span>}
-                </div>
-                <div className="chips">
-                  {brand && <span className="chip noncite"><span className="role brand">brand</span>{brand.name}</span>}
-                  {comps.map((c) => <span key={c.id} className="chip noncite"><span className="role competitor">vs</span>{c.name}</span>)}
-                </div>
-                <div className="meta">
-                  <span>{p.city ? `${p.city}, ` : ""}{countryName(p.country_code) ?? p.country_code}</span>
-                  <span>Daily run {p.schedule_daily ? "on" : "off"}</span>
-                  <span>{last ? `Last run ${new Date(last.started_at).toUTCString().slice(5, 22)} UTC` : "Run it from the project page"}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </section>
-        <aside className="sticky"><NewProjectForm countries={countries} /></aside>
-      </div>
+    <div className="wz home acct">
+      <header className="wz-top">
+        <a href="/projects" className="wz-logo"><span className="wz-mark">A</span>AdFlank</a>
+        <nav className="wz-top-r">
+          <span className="acct-email">{user.email}</span>
+          <LogoutButton />
+        </nav>
+      </header>
+      <main className="home-main acct-main">
+        <h1>Whose customers do you want next?</h1>
+        <SiteForm />
+        {list.length > 0 && (
+          <section className="acct-list">
+            <p className="wz-eyebrow">Your searches</p>
+            {list.map((p) => (
+              <a key={p.id} className="acct-row" href={`/go/${p.id}`}>
+                <span className="wz-fav sm">{p.name.slice(0, 1).toUpperCase()}</span>
+                <span className="min0">
+                  <b className="ell">{p.name}</b>
+                  <span className="muted small ell">{p.rivals.length ? `vs ${p.rivals.join(", ")}` : "no competitors yet"}</span>
+                </span>
+                <span className={`acct-st ${p.status ?? ""}`}>{p.status ? (STATUS[p.status] ?? p.status) : "not run"}</span>
+                <span className="muted small acct-at">{ago(p.at)}</span>
+              </a>
+            ))}
+          </section>
+        )}
+      </main>
     </div>
   );
 }

@@ -51,6 +51,9 @@ export class MockQlooClient implements QlooClient {
 
   async call(name: string, args: Record<string, unknown>): Promise<QlooEnvelope> {
     this.calls.push({ name, args });
+    // Local UI work only: slow the synthetic answers down so the live page can be watched.
+    const delay = Number(process.env.QLOO_MOCK_DELAY_MS);
+    if (delay > 0) await new Promise((r) => setTimeout(r, Math.min(delay, 5000)));
     const op = name.replace(/^qloo_/, "");
     const ok = (extra: Record<string, unknown>): QlooEnvelope => ({ schema_version: "mock", operation: op, status: "ok", ...extra });
     switch (name) {

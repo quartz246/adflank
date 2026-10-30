@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { csrfError, hashPassword, isHttps, json, newSessionCookie, validEmail } from "@/lib/auth/session";
-import { users } from "@/lib/db/repo";
+import { csrfError, currentUser, isGuestUser, hashPassword, isHttps, json, newSessionCookie, validEmail } from "@/lib/auth/session";
+import { projects, users } from "@/lib/db/repo";
 import { allow, clientIp } from "@/lib/limits";
 
 export const runtime = "nodejs";
@@ -15,6 +15,15 @@ export async function POST(req: Request) {
   if (!p.success || !validEmail(p.data.email)) return json({ error: "Enter a valid email and a password of at least 8 characters." }, 400);
   if (p.data.email.endsWith(".invalid")) return json({ error: "Enter a valid email." }, 400);
   if (users.byEmail(p.data.email)) return json({ error: "That email already has an account. Log in instead." }, 409);
+  const guest = await currentUser();
+  if (isGuestUser(guest)) {
+    // "Save it": the guest's website projects move with the account and start running daily.
+    users.claim(guest!.id, p.data.email, await hashPassword(p.data.password));
+    for (const pr of projects.forUser(guest!.id)) projects.update(pr.id, { schedule_daily: 1 });
+    const res = json({ ok: true, claimed: true });
+    res.headers.append("set-cookie", serializeCookie(newSessionCookie(guest!.id, isHttps(req))));
+    return res;
+  }
   const user = users.create(p.data.email, await hashPassword(p.data.password));
   const ck = newSessionCookie(user.id, isHttps(req));
   const res = json({ ok: true });
@@ -24,5 +33,5 @@ export async function POST(req: Request) {
 
 export function serializeCookie(ck: { name: string; value: string; options: Record<string, unknown> }): string {
   const o = ck.options;
-  return [`${ck.name}=${ck.value}`, `Path=${o.path ?? "/"}`, `Max-Age=${o.maxAge ?? 0}`, "HttpOnly", "SameSite=Lax", o.secure ? "Secure" : ""].filter(Boolean).join("; ");
+  return [`${ck.name}=${ck.value}`, `Path=${o.path ?? "/"}`, o.maxAge === undefined ? "" : `Max-Age=${o.maxAge}`, "HttpOnly", "SameSite=Lax", o.secure ? "Secure" : ""].filter(Boolean).join("; ");
 }

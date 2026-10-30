@@ -17,7 +17,7 @@ export interface ToolDef {
 }
 
 export interface ChatRequest {
-  purpose: "planner" | "worker" | "copy" | "chat";
+  purpose: "planner" | "market" | "worker" | "copy" | "chat";
   messages: ChatMessage[];
   tools?: ToolDef[];
   json?: boolean;

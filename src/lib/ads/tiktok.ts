@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { AttackPackage, PlatformTemplate } from "@/lib/types/attack";
 import { TIKTOK, textLength } from "./limits";
 import { Issues } from "./validate";
-import { cleanText, copyBank, firstFit, fitClause, hardCut, peopleLike, stripTikTokSymbols } from "./copy";
+import { cleanText, copyBank, firstFit, fitClause, hardCut, peopleLike, stripTikTokSymbols, possessive } from "./copy";
 import {
   PLACEHOLDER_URL, skippedPlacesIssues, ageSpan, checkTrademark, contextFrom, finish, genderSkew, plannedPlaces,
   zName, zPlace, zText, zUrl, type BuildContext,
@@ -54,7 +54,7 @@ export function planTikTok(pkg: AttackPackage, opts: { landingUrl?: string } = {
   const cites: string[] = [pkg.who.cite];
 
   const g0 = b.gaps[0]?.label, g1 = b.gaps[1]?.label;
-  const lead = stripTikTokSymbols(b.angles[0] ?? (g0 ? `Made for people who love ${g0}.` : `Meet ${b.brand}.`));
+  const lead = stripTikTokSymbols(b.angles[0] ?? (g0 ? `For people who love ${g0}.` : `Meet ${b.brand}.`));
   const adText = firstFit([`${lead} Try ${b.brand}.`, lead], TIKTOK.adText.max) ?? fitClause(lead, TIKTOK.adText.max) ?? hardCut(lead, TIKTOK.adText.max);
   const displayName = firstFit([b.brand], TIKTOK.displayName.max) ?? hardCut(b.brand, TIKTOK.displayName.max);
 
@@ -83,7 +83,7 @@ export function planTikTok(pkg: AttackPackage, opts: { landingUrl?: string } = {
     campaignName: `AdFlank | ${b.brand} vs ${b.competitor}`.slice(0, 255),
     objectiveType: "TRAFFIC",
     dailyBudget: 50,
-    adgroupName: `People like ${b.competitor}'s customers`.slice(0, 255),
+    adgroupName: `People like ${possessive(b.competitor)} customers`.slice(0, 255),
     locations: [
       ...places.cities.map((w) => ({ name: w.name, countryCode: w.countryCode })),
       ...places.regions.map((w) => ({ name: w.name, countryCode: w.countryCode })),

@@ -72,6 +72,13 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
   return 6371 * 2 * Math.asin(Math.sqrt(a));
 }
 
+/** Approximate centre of a listed metro by name (case-insensitive), or undefined. */
+export function cityCoords(name: string): { lat: number; lon: number } | undefined {
+  const n = name.trim().toLowerCase();
+  const c = CITIES.find(([nm]) => nm.toLowerCase() === n);
+  return c ? { lat: c[3], lon: c[4] } : undefined;
+}
+
 /** Nearest listed metro within maxKm, or undefined. */
 export function nearestCity(lat: number, lon: number, maxKm = 250): NearCity | undefined {
   let best: NearCity | undefined;

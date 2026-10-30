@@ -34,3 +34,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+
+---
+
+## Map outlines: us-atlas and world-atlas
+
+`src/lib/geo/outlines.ts` holds SVG paths baked from `us-atlas` 3.0.1 (`states-10m.json`, derived from the U.S. Census Bureau's
+cartographic boundary files, public domain) and `world-atlas` 2.0.2 (`land-110m.json`, derived from Natural Earth, public domain).
+Both packages are published by Mike Bostock under the ISC license:
+
+Copyright 2013-2019 Michael Bostock
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that
+the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR
+ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.

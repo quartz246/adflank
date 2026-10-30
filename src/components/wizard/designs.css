@@ -1,0 +1,125 @@
+/* Five looks for the same layout. html[data-design] picks one (cookie adflank_design, ?design=N, or the switcher). */
+
+/* 1 · Midnight: the original dark look, tightened */
+html[data-design="1"] .wz { --w-font: var(--f-inter), var(--font); --w-display: var(--f-inter), var(--font); }
+html[data-design="1"] .wz h1 { letter-spacing: -.035em; }
+
+/* 2 · Paper: warm light editorial, serif headlines, one vermilion accent */
+html[data-design="2"] .wz {
+  --w-bg: #f5f1ea; --w-side: #efe9df; --w-card: #fffdf8; --w-card2: #f1eadf; --w-line: #e4dccf; --w-line2: #d3c8b6;
+  --w-text: #1b1712; --w-text2: #4a4238; --w-muted: #665c4e; --w-faint: #73685a;
+  --w-blue: #d4361c; --w-blue-soft: color-mix(in srgb, #d4361c 9%, transparent); --w-accent-hover: #b42c15; --w-on-accent: #fffdf8;
+  --w-green: #2f7d4f; --w-green-soft: color-mix(in srgb, #2f7d4f 12%, transparent); --w-on-green: #fffdf8; --w-red: #b42318; --w-amber: #a8650c;
+  --w-them: #d4361c; --w-you: #3b3226; --w-hl: #d4361c; --w-place: #2f5d8a; --w-stage: #ebe3d6;
+  --w-r: 6px; --w-r-sm: 4px; --w-r-mark: 4px; --w-shadow: 0 1px 2px rgba(60, 40, 10, .06); --w-shadow-lg: 0 14px 40px rgba(60, 40, 10, .10);
+  --w-mark: #1b1712; --w-on-mark: #f5f1ea;
+  --w-font: var(--f-inter), var(--font); --w-display: var(--f-serif), Georgia, serif;
+  color-scheme: light;
+}
+html[data-design="2"] .wz h1, html[data-design="2"] .wz h2, html[data-design="2"] .wz-card.hook h2 { font-family: var(--w-display); font-weight: 400; letter-spacing: -.01em; }
+html[data-design="2"] .home-main h1 { font-size: clamp(42px, 7vw, 76px); font-weight: 400; letter-spacing: -.02em; }
+html[data-design="2"] .wz .hl { font-style: italic; }
+html[data-design="2"] .wz-logo { font-family: var(--w-display); font-weight: 400; font-size: 21px; }
+
+/* 3 · Signal: near-black, lime accent, monospace labels */
+html[data-design="3"] .wz {
+  --w-bg: #050505; --w-side: #0a0a0a; --w-card: #0f0f0f; --w-card2: #171717; --w-line: #1f1f1f; --w-line2: #2c2c2c;
+  --w-text: #f4f4ee; --w-text2: #b8b8ae; --w-muted: #a3a399; --w-faint: #86867c;
+  --w-blue: #c8ff2e; --w-blue-soft: color-mix(in srgb, #c8ff2e 10%, transparent); --w-accent-hover: #b4ec14; --w-on-accent: #0a0a0a;
+  --w-green: #c8ff2e; --w-green-soft: color-mix(in srgb, #c8ff2e 10%, transparent); --w-on-green: #0a0a0a; --w-red: #ff4d4d; --w-amber: #ffb020;
+  --w-them: #ff5ca8; --w-you: #8a8aff; --w-hl: #c8ff2e; --w-place: #8ae9ff; --w-stage: #e9e9e3;
+  --w-r: 4px; --w-r-sm: 3px; --w-r-mark: 2px; --w-shadow: none; --w-shadow-lg: 0 0 0 1px #2c2c2c;
+  --w-mark: #c8ff2e; --w-on-mark: #050505;
+  --w-font: var(--f-grotesk), var(--font); --w-display: var(--f-grotesk), var(--font); --w-label: var(--f-mono), var(--mono);
+}
+html[data-design="3"] .wz-eyebrow, html[data-design="3"] .wz .eyebrow { letter-spacing: .14em; font-weight: 500; }
+html[data-design="3"] .wz-step .t, html[data-design="3"] .tp-agent .nm { font-family: var(--w-label); font-size: 12px; font-weight: 500; letter-spacing: .02em; }
+html[data-design="3"] .home-main h1 { text-transform: uppercase; letter-spacing: -.04em; font-weight: 700; }
+html[data-design="3"] .wz-chip, html[data-design="3"] .wz-btn { font-family: var(--w-label); text-transform: uppercase; letter-spacing: .06em; font-size: 12px; }
+
+/* 4 · Aurora: deep violet, soft gradient glows, glass cards */
+html[data-design="4"] .wz {
+  --w-bg: #0b0820; --w-side: rgba(255, 255, 255, .03); --w-card: rgba(255, 255, 255, .045); --w-card2: rgba(255, 255, 255, .07);
+  --w-line: rgba(255, 255, 255, .08); --w-line2: rgba(255, 255, 255, .15);
+  --w-text: #f4f1ff; --w-text2: #cbc4ea; --w-muted: #b0a9d2; --w-faint: #948db9;
+  --w-blue: #8b5cf6; --w-blue-soft: color-mix(in srgb, #8b5cf6 16%, transparent); --w-accent-hover: #7c3aed; --w-on-accent: #fff;
+  --w-green: #34d399; --w-on-green: #062016; --w-red: #fb7185; --w-amber: #fbbf24; --w-them: #f472b6; --w-you: #818cf8;
+  --w-hl: #f9a8d4; --w-place: #a5b4fc; --w-stage: #efecfa;
+  --w-r: 18px; --w-r-sm: 12px; --w-r-mark: 9px; --w-shadow: 0 20px 50px rgba(5, 2, 20, .45); --w-shadow-lg: 0 30px 90px rgba(139, 92, 246, .25);
+  --w-mark: linear-gradient(135deg, #8b5cf6, #ec4899); --w-on-mark: #fff;
+  --w-font: var(--f-sora), var(--font); --w-display: var(--f-sora), var(--font);
+  background: radial-gradient(55% 45% at 12% -5%, rgba(139, 92, 246, .32), transparent 65%), radial-gradient(45% 40% at 95% 0%, rgba(236, 72, 153, .22), transparent 60%), radial-gradient(60% 50% at 50% 110%, rgba(56, 189, 248, .12), transparent 60%), #0b0820;
+}
+html[data-design="4"] .wz-card, html[data-design="4"] .tp-card, html[data-design="4"] .tp-main, html[data-design="4"] .wz-brand, html[data-design="4"] .ca-side { backdrop-filter: blur(14px); }
+html[data-design="4"] .wz-side, html[data-design="4"] .wz-top { background: rgba(11, 8, 32, .55); backdrop-filter: blur(12px); }
+html[data-design="4"] .wz-btn:not(.ghost), html[data-design="4"] .wz.home .siteform .btn { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+html[data-design="4"] .home-main h1 { background: linear-gradient(180deg, #fff 30%, #c4b5fd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+html[data-design="4"] .wz-bar i { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+
+/* 5 · Studio: crisp light, Swiss, cobalt, sharp corners */
+html[data-design="5"] .wz {
+  --w-bg: #f3f4f6; --w-side: #ffffff; --w-card: #ffffff; --w-card2: #f3f4f6; --w-line: #e2e5ea; --w-line2: #cdd2da;
+  --w-text: #0b0c0e; --w-text2: #3b4048; --w-muted: #525865; --w-faint: #636a76;
+  --w-blue: #2443ff; --w-blue-soft: color-mix(in srgb, #2443ff 8%, transparent); --w-accent-hover: #1a33d6; --w-on-accent: #fff;
+  --w-green: #0f9d58; --w-green-soft: color-mix(in srgb, #0f9d58 10%, transparent); --w-on-green: #fff; --w-red: #e5341f; --w-amber: #b26b00;
+  --w-them: #2443ff; --w-you: #0b0c0e; --w-hl: #2443ff; --w-place: #2443ff; --w-stage: #eceef2;
+  --w-r: 2px; --w-r-sm: 2px; --w-r-mark: 0; --w-shadow: none; --w-shadow-lg: 0 1px 0 #cdd2da;
+  --w-mark: #2443ff; --w-on-mark: #fff;
+  --w-font: var(--f-plex), var(--font); --w-display: var(--f-plex), var(--font); --w-label: var(--f-plex), var(--font);
+  color-scheme: light;
+}
+html[data-design="5"] .wz h1 { font-weight: 700; letter-spacing: -.03em; }
+html[data-design="5"] .home-main { align-items: flex-start; text-align: left; }
+html[data-design="5"] .home-main h1 { font-size: clamp(40px, 7vw, 80px); line-height: .98; letter-spacing: -.05em; }
+html[data-design="5"] .home-steps { justify-content: flex-start; }
+html[data-design="5"] .home-line { justify-content: flex-start; }
+html[data-design="5"] .wz-card.hook { background: #2443ff; border-color: #2443ff; }
+html[data-design="5"] .wz-card.hook h2, html[data-design="5"] .wz-card.hook .eyebrow, html[data-design="5"] .wz-card.hook p { color: #fff; }
+html[data-design="5"] .wz-card.hook .hl { color: #fff; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+/* light designs: the steps' "done" ticks and chips need contrast */
+html[data-design="2"] .wz .wz-step.done .wz-ic, html[data-design="5"] .wz .wz-step.done .wz-ic { color: #fff; }
+
+/* the switcher */
+.ds { position: fixed; right: 14px; bottom: 14px; z-index: 100; display: flex; gap: 4px; align-items: center; padding: 5px; border-radius: 999px; background: rgba(15, 15, 20, .82); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, .14); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); font: 600 12px/1 system-ui, sans-serif; color: #ddd; }
+.ds span { padding: 0 6px 0 8px; color: #aaa; }
+.ds button { all: unset; cursor: pointer; padding: 6px 10px; border-radius: 999px; color: #ddd; }
+.ds button:hover { background: rgba(255, 255, 255, .1); }
+.ds button.on { background: #fff; color: #111; }
+html[data-design="3"] .home-steps li, html[data-design="3"] .wz-chip, html[data-design="3"] .tp-st, html[data-design="3"] .acct-st,
+html[data-design="5"] .home-steps li, html[data-design="5"] .wz-chip, html[data-design="5"] .tp-st, html[data-design="5"] .acct-st { border-radius: var(--w-r-sm); }
+
+/* 6 · Qloo: qloo.com's palette. Warm off-white page, near-black hero panel, navy side panel, periwinkle accent, mauve statements */
+html[data-design="6"] .wz {
+  --w-bg: #f8f6f4; --w-side: #ffffff; --w-card: #ffffff; --w-card2: #f1eeea; --w-line: #e8e3dd; --w-line2: #d9d2ca;
+  --w-text: #2f3943; --w-text2: #555e68; --w-muted: #59606a; --w-faint: #6a6259;
+  --w-blue: #6464ae; --w-blue-soft: color-mix(in srgb, #8c8cc8 16%, transparent); --w-accent-hover: #55559f; --w-on-accent: #fff;
+  --w-green: #2a7d70; --w-green-soft: color-mix(in srgb, #2a7d70 12%, transparent); --w-on-green: #fff; --w-red: #c2546b; --w-amber: #b9853c;
+  --w-them: #785064; --w-you: #8c8cc8; --w-hl: #785064; --w-place: #5c5ca8; --w-stage: #efebe6;
+  --w-r: 20px; --w-r-sm: 999px; --w-r-mark: 8px; --w-shadow: 0 1px 2px rgba(40, 50, 60, .05), 0 8px 24px rgba(40, 50, 60, .05); --w-shadow-lg: 0 10px 30px rgba(92, 92, 168, .12);
+  --w-mark: #28323c; --w-on-mark: #f8f6f4;
+  --w-font: var(--f-dm), var(--font); --w-display: var(--f-dm), var(--font);
+  color-scheme: light;
+}
+html[data-design="6"] .wz h1 { font-weight: 700; letter-spacing: -.025em; }
+html[data-design="6"] .wz-logo { letter-spacing: -.02em; }
+html[data-design="6"] .wz-top { background: #f8f6f4; }
+/* soft side panel: a shade off the page, no hard dark block */
+html[data-design="6"] .wz-side { background: #fbfaf8; border-right: 1px solid #ece7e1; }
+/* the home hero: a soft lavender-to-blush panel (Qloo's accent hues at low strength) instead of a black block */
+html[data-design="6"] .home-main {
+  max-width: 1180px; width: calc(100% - 40px); margin: 22px auto 0; border-radius: 28px; padding: 13vh 28px 9vh;
+  background: radial-gradient(60% 70% at 85% 10%, rgba(140, 140, 200, .20), transparent 65%), radial-gradient(60% 60% at 10% 100%, rgba(120, 80, 100, .10), transparent 60%), linear-gradient(180deg, #f3f1fa, #f7f2f1);
+  border: 1px solid #ebe6ef;
+}
+html[data-design="6"] .home-main h1 { font-weight: 700; letter-spacing: -.035em; color: #2f3943; }
+html[data-design="6"] .home-main .siteform { box-shadow: 0 10px 30px rgba(92, 92, 168, .12); border-color: #e2ddec; }
+html[data-design="6"] .acct-main { padding-top: 9vh; }
+html[data-design="6"] .wz-card.hook { background: linear-gradient(135deg, #f1effa, #f7eef3); border-color: #e4dff2; }
+html[data-design="6"] .wz-card.hook h2 { color: #785064; }
+html[data-design="6"] .wz-card.hook .hl { color: #5c5ca8; }
+html[data-design="6"] .wz-bar i { background: linear-gradient(90deg, #8c8cc8, #785064); }
+/* Qloo periwinkle stays for fills (bars, meters); text and buttons use the deeper shade so they read at 4.5:1+ */
+html[data-design="6"] .wz .meter i, html[data-design="6"] .wz .meter.you i { background: #8c8cc8; }
+html[data-design="6"] .wz .wz-step.done .wz-ic { color: #fff; }
+html[data-design="6"] .home-foot { border-top: 0; }

@@ -31,15 +31,19 @@ export function isHttps(req: Request): boolean {
   return new URL(req.url).protocol === "https:";
 }
 
-export function newSessionCookie(userId: number, secure: boolean): { name: string; value: string; options: Record<string, unknown> } {
+/** `browserOnly`: a guest session. The cookie has no Max-Age (gone when the browser closes) and the server forgets it after a day. */
+export function newSessionCookie(userId: number, secure: boolean, browserOnly = false): { name: string; value: string; options: Record<string, unknown> } {
   const token = randomBytes(32).toString("base64url");
-  sessions.create(sha256(token), userId, TTL_DAYS);
-  return { name: SESSION_COOKIE, value: token, options: { httpOnly: true, sameSite: "lax", secure, path: "/", maxAge: TTL_DAYS * 86400 } };
+  sessions.create(sha256(token), userId, browserOnly ? 1 : TTL_DAYS);
+  return { name: SESSION_COOKIE, value: token, options: { httpOnly: true, sameSite: "lax", secure, path: "/", ...(browserOnly ? {} : { maxAge: TTL_DAYS * 86400 }) } };
 }
 
 export function userFromToken(token: string | undefined): UserRow | undefined {
   if (!token || token.length < 20 || token.length > 100) return undefined;
-  return sessions.user(sha256(token));
+  const u = sessions.user(sha256(token));
+  // The shared demo account ("demo@adflank.invalid") only works while DEMO=1; otherwise its sessions are dead.
+  if (u && u.email === "demo@adflank.invalid" && process.env.DEMO !== "1") return undefined;
+  return u;
 }
 
 /** The logged-in user for server components and route handlers. */
@@ -88,6 +92,10 @@ export async function guard(req: Request, projectId?: string | number): Promise<
   if (!project) return { error: json({ error: "not found" }, 404) };
   return { user, project };
 }
+
+/** Accounts made by "paste your website" without signing up. Signing up turns the guest into a real account. */
+export const GUEST_DOMAIN = "@guest.adflank.invalid";
+export const isGuestUser = (u: UserRow | undefined) => Boolean(u && u.email.endsWith(GUEST_DOMAIN));
 
 export function validEmail(e: string): boolean {
   return /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(e) && e.length <= 254;

@@ -53,11 +53,20 @@ describe("auth, sessions, CSRF, ownership, limits", () => {
   it("limits runs per account and per IP", () => {
     process.env.RUN_LIMIT_PER_USER_DAY = "2";
     process.env.RUN_LIMIT_PER_IP_DAY = "3";
-    expect(allowRun(1001, "ip-a", false).ok).toBe(true);
-    expect(allowRun(1001, "ip-a", false).ok).toBe(true);
-    expect(allowRun(1001, "ip-a", false).ok).toBe(false);
-    expect(allowRun(1002, "ip-a", false).ok).toBe(true);
-    expect(allowRun(1003, "ip-a", false).ok).toBe(false);
+    // Visitors without an account (guests): per account and per network.
+    const g1 = users.create("guest-a1@guest.adflank.invalid", "!").id;
+    const g2 = users.create("guest-a2@guest.adflank.invalid", "!").id;
+    const g3 = users.create("guest-a3@guest.adflank.invalid", "!").id;
+    expect(allowRun(g1, "ip-a", false).ok).toBe(true);
+    expect(allowRun(g1, "ip-a", false).ok).toBe(true);
+    expect(allowRun(g1, "ip-a", false).ok).toBe(false);
+    expect(allowRun(g2, "ip-a", false).ok).toBe(true);
+    expect(allowRun(g3, "ip-a", false).ok).toBe(false);
+    // Signed-in accounts: their own daily limit only, whatever the network.
+    const m = users.create("member-a@example.com", "x").id;
+    expect(allowRun(m, "ip-a", false).ok).toBe(true);
+    expect(allowRun(m, "ip-a", false).ok).toBe(true);
+    expect(allowRun(m, "ip-a", false).ok).toBe(false);
     expect(rate.hit("t", "k", 1000, 1, 5000)).toBe(true);
     expect(rate.hit("t", "k", 1000, 1, 5500)).toBe(false);
     expect(rate.hit("t", "k", 1000, 1, 7000)).toBe(true);
