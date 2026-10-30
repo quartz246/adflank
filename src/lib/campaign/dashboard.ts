@@ -91,7 +91,7 @@ export function buildDashboard(user: UserRow, now = Date.now()): Dashboard {
   const log: Dashboard["log"] = runRows.slice(0, 12).map((r) => {
     const b = byId.get(r.project_id);
     const brand = b?.brand ?? "a brand";
-    const rivals = b?.rivals.length ? b.rivals.join(" and ") : "the rivals";
+    const rivals = b?.rivals.length ? (b.rivals.length <= 1 ? b.rivals[0] : `${b.rivals.slice(0, -1).join(", ")} and ${b.rivals[b.rivals.length - 1]}`) : "the rivals";
     const top = b?.plan?.items[0];
     const text =
       r.status === "done"

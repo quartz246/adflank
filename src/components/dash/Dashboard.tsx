@@ -300,6 +300,7 @@ export default function Dashboard({ data, email }: { data: Data; email: string }
                   ) : <p className="mc-empty">{running ? "The agents are profiling the rivals' fans on Qloo…" : "No finished run yet."}</p>}
                   <footer>
                     <span className="mc-when">{p.plan ? `${p.plan.campaigns} campaigns · $${p.plan.budget}/day · ~${fmtReach(p.plan.reach)}/wk` : ""}<br />Last run {ago(p.at)}</span>
+                    <a className="mc-btn ghost" href={`/start?site=${encodeURIComponent(p.domain)}&brand=${p.id}`}>Add or change rivals</a>
                     <RunAgain projectId={p.id} running={running} />
                     <a className="mc-btn" href={`/go/${p.id}`}>Open →</a>
                   </footer>

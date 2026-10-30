@@ -201,13 +201,13 @@ export default function Wizard({ projectId, initial }: { projectId: number; init
               ? <FanProfile comps={v.comps.map((c) => ({ name: c.name, done: c.done, pkg: c.pkg as AttackPackage, heat: c.heat }))} ci={ci} onPick={setCi} brand={v.brand?.name ?? v.project.name} country={v.project.country ?? "US"} designing={!campaignReady && steps[5]?.status === "working"} projectId={projectId} ready={campaignReady} onOpen={(n) => { setFocusSeg({ n, at: Date.now() }); setSel(4); }} />
               : steps.slice(2, 5).every((r) => r.status === "skipped") ? <div className="wz-card muted">{steps[2].note}</div> : <Skeleton />)}
             {shownStage === 4 && (campaignReady && v.comps.length
-              ? <AgencyStudio pkgs={v.comps.map((c) => c.pkg as AttackPackage)} brand={v.brand?.name ?? v.project.name} start={`/go/${projectId}/campaign`} focus={focusSeg} heat={v.comps.flatMap((c) => c.heat)} scheduled={"scheduled" in v.project ? v.project.scheduled : undefined} settings={v.settings} />
+              ? <AgencyStudio pkgs={v.comps.map((c) => c.pkg as AttackPackage)} brand={v.brand?.name ?? v.project.name} domain={v.site?.domain ?? v.project.name} start={`/go/${projectId}/campaign`} focus={focusSeg} heat={v.comps.flatMap((c) => c.heat)} scheduled={"scheduled" in v.project ? v.project.scheduled : undefined} settings={v.settings} />
               : <Skeleton rows={4} />)}
           </div>
 
           {done && !final && sel !== null && (
             <div className="wz-cta slim">
-              <span>Keep Poachly watching {v.comps.map((c) => c.name).join(" and ")} every day · {v.qlooCalls} cited Qloo calls</span>
+              <span>Keep Poachly watching {andList(v.comps.map((c) => c.name))} every day · {v.qlooCalls} cited Qloo calls</span>
               <a className="wz-btn sm" href={`/go/${projectId}/campaign`}>Start campaign →</a>
             </div>
           )}
@@ -302,4 +302,8 @@ function StepMarket({ v, st, onPick }: { v: Full; st: StepRow; onPick: (i: numbe
       </div>
     </div>
   );
+}
+
+function andList(xs: string[]): string {
+  return xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
 }

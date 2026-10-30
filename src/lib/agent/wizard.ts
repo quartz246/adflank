@@ -30,7 +30,9 @@ export const PHASES = [
 ] as const;
 export type Phase = (typeof PHASES)[number];
 
-export const MAX_RIVALS = 2;
+/** Rivals the owner may pick (setup or "Add or change rivals"); the agents pick AUTO_RIVALS on their own to keep runs quick. */
+export const MAX_RIVALS = 5;
+export const AUTO_RIVALS = 2;
 
 /** What the website flow needs from the run (structural, so run.ts and this file do not import each other). */
 export interface RunCtx {
@@ -129,7 +131,7 @@ export async function findCompetitors(st: RunCtx, site: SiteInfo): Promise<Entit
       source = "picked by the agent";
     }
   }
-  if (!names.length) names = candidates.slice(0, MAX_RIVALS).map((c) => c.name);
+  if (!names.length) names = candidates.slice(0, AUTO_RIVALS).map((c) => c.name);
 
   const picked: EntityRow[] = [];
   await addFound(st, brand, names, candidates, picked);
@@ -142,7 +144,7 @@ export async function findCompetitors(st: RunCtx, site: SiteInfo): Promise<Entit
   }
   if (!picked.length) {
     // Last resort: the first Qloo candidates, so the flow can go on.
-    for (const c of candidates.slice(0, MAX_RIVALS)) {
+    for (const c of candidates.slice(0, AUTO_RIVALS)) {
       const e = entities.add(st.project.id, "competitor", c.name);
       entities.setResolution(e.id, { status: "found", qloo_id: c.id, qloo_type: "urn:entity:brand", qloo_name: c.name });
       picked.push(entities.byId(e.id)!);
@@ -158,10 +160,10 @@ export async function findCompetitors(st: RunCtx, site: SiteInfo): Promise<Entit
   return picked;
 }
 
-/** Add each name that Qloo knows as a competitor entity, up to MAX_RIVALS in total. */
+/** Add each name that Qloo knows as a competitor entity, up to AUTO_RIVALS in total (the agents' own pick). */
 async function addFound(st: RunCtx, brand: EntityRow, names: string[], candidates: Array<{ id: string; name: string }>, picked: EntityRow[]): Promise<void> {
   for (const raw of names.slice(0, 6)) {
-    if (picked.length >= MAX_RIVALS) break;
+    if (picked.length >= AUTO_RIVALS) break;
     const name = clip(raw.trim(), 60);
     if (!name || name.toLowerCase() === brand.name.toLowerCase() || picked.some((p) => p.name.toLowerCase() === name.toLowerCase())) continue;
     const e = entities.add(st.project.id, "competitor", name);

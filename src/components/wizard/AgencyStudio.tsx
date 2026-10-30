@@ -55,7 +55,7 @@ const TABS: Array<{ id: Tab; label: string }> = [
 
 const TAB_PLATFORM: Record<Tab, Platform> = { feed: "meta", story: "meta", tiktok: "tiktok", google: "google" };
 
-export default function AgencyStudio({ pkgs, brand, start, focus, heat, scheduled, settings }: { pkgs: AttackPackage[]; brand: string; start: string; focus?: { n: number; at: number } | null; heat: HeatCell[]; scheduled?: boolean; settings?: unknown }) {
+export default function AgencyStudio({ pkgs, brand, domain, start, focus, heat, scheduled, settings }: { pkgs: AttackPackage[]; brand: string; domain: string; start: string; focus?: { n: number; at: number } | null; heat: HeatCell[]; scheduled?: boolean; settings?: unknown }) {
   const projectId = Number(start.match(/\/go\/(\d+)/)?.[1] ?? 0);
   // The pool the agency draws from; campaign n on screen shows pool segment active[n] (its images use the pool index).
   const pool = useMemo(() => buildSegments(pkgs, brand, undefined, undefined, POOL_SEGMENTS), [pkgs, brand]);
@@ -177,7 +177,7 @@ export default function AgencyStudio({ pkgs, brand, start, focus, heat, schedule
         <div className="ag-min">
           <p className="ag-live"><i />Your ad agency is on it · working non-stop</p>
           <h2>{live.length} campaigns, one for every segment of {list(comps.map((c) => possessive(c)))} fans</h2>
-          <p className="ag-sub">Each segment gets its own ads, aimed at the cities where those fans are strongest. Raise the budget and the agency opens more cities and tastes.</p>
+          <p className="ag-sub"><a className="ag-rivals" href={`/start?brand=${projectId}&site=${encodeURIComponent(domain)}`}>Add or change rivals ({comps.length} of 5)</a> · Each segment gets its own ads, aimed at the cities where those fans are strongest. Raise the budget and the agency opens more cities and tastes.</p>
           <p className="ag-daily"><i />The agents work daily: they re-read {list(comps.map((c) => possessive(c)))} fans on Qloo, uncover new segments and create ads for them.{scheduled === false && <> <a href={`/signup?claim=${projectId}`}>Sign up free to keep them working</a>.</>}</p>
         </div>
         <div className="ag-budget">

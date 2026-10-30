@@ -12,12 +12,12 @@ import { BANDS, budgetAt, PLAT_LABEL, PLATFORMS, runsFor, SLIDER, type Platform 
 interface Rival { id: string; name: string; popularity?: number; note?: string }
 interface Suggest { brand: { name: string; found: boolean; note?: string }; site: { domain: string; title: string }; rivals: Rival[] }
 type Step = 1 | 2 | 3 | 4;
-const MAX = 2;
+const MAX = 5; // rivals the owner may tick; more rivals, longer run
 const STEPS = ["Your website", "Rivals", "Market & audience", "Platforms & budget"];
 
 const pctl = (p?: number) => (typeof p === "number" ? `top ${Math.max(1, Math.round((1 - p) * 100))}% on Qloo` : "");
 
-export default function Onboarding({ countries, initialSite }: { countries: Array<{ code: string; name: string }>; initialSite: string }) {
+export default function Onboarding({ countries, initialSite, current = [], country: initialCountry = "US" }: { countries: Array<{ code: string; name: string }>; initialSite: string; current?: Rival[]; country?: string }) {
   const [step, setStep] = useState<Step>(1);
   const [site, setSite] = useState(initialSite);
   const [busy, setBusy] = useState("");
@@ -26,7 +26,7 @@ export default function Onboarding({ countries, initialSite }: { countries: Arra
   const [list, setList] = useState<Rival[]>([]);
   const [picked, setPicked] = useState<Rival[]>([]);
   const [q, setQ] = useState("");
-  const [country, setCountry] = useState("US");
+  const [country, setCountry] = useState(initialCountry);
   const [ages, setAges] = useState<string[]>([]);
   const [plats, setPlats] = useState<Platform[]>([...PLATFORMS]);
   const [pos, setPos] = useState(SLIDER / 2);
@@ -43,8 +43,9 @@ export default function Onboarding({ countries, initialSite }: { countries: Arra
     setBusy("");
     if (!r.ok) return setErr(r.data.error ?? "Could not read that website.");
     setSug(r.data);
-    setList(r.data.rivals);
-    setPicked(r.data.rivals.slice(0, MAX));
+    // The brand's current rivals (when changing them) come first and stay ticked; otherwise Qloo's top two are ticked.
+    setList([...current, ...r.data.rivals.filter((x) => !current.some((c) => c.id === x.id))]);
+    setPicked(current.length ? current : r.data.rivals.slice(0, 2));
     setStep(2);
   }
   async function search() {
@@ -111,7 +112,7 @@ export default function Onboarding({ countries, initialSite }: { countries: Arra
         {step === 2 && sug && (
           <div className="ob-pane">
             <h1>Whose customers do you want?</h1>
-            <p className="ob-sub">{list.length ? <>Brands <b>{sug.brand.name}</b>&apos;s fans also love, from Qloo. Tick up to {MAX}.</> : <><b>{sug.brand.name}</b> is not in Qloo yet, so search for your rivals by name.</>}</p>
+            <p className="ob-sub">{list.length ? <>Brands <b>{sug.brand.name}</b>&apos;s fans also love, from Qloo. Tick up to {MAX}; each extra rival adds a little run time.</> : <><b>{sug.brand.name}</b> is not in Qloo yet, so search for your rivals by name.</>}</p>
             <form className="ob-search" onSubmit={(e) => { e.preventDefault(); void search(); }}>
               <input id="ob-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search Qloo for a rival, e.g. Nike" aria-label="Search Qloo for a rival" />
               <button disabled={!!busy || q.trim().length < 2}>Search</button>

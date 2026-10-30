@@ -337,3 +337,5 @@
 .ag-saved.saved { color: var(--w-green); }
 .ag-saved.error { color: var(--w-red); }
 .ag-qloo { padding-right: 70px; }
+
+.ag-rivals { color: #fff !important; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
